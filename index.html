@@ -2194,6 +2194,121 @@ body.cs-locked{overflow:hidden}
 
   body.m-sheet-open{overflow:hidden}
 }
+
+/* ─────────────────────────────  MOBILE · DENSITY CUTS (≤720px)  ───────────────────────────── */
+/* One screen, one idea — strip editorial chrome on phones, keep the heading + the thing. */
+@media (max-width:720px){
+  /* drop the section numbers — keep titles only */
+  .section-head .num{display:none}
+  .section-head{border-top-width:0;padding-top:0;margin-bottom:4.4vh}
+  .section-head .ttl{padding-top:1.1rem;border-top:1px solid var(--ink)}
+  .live-sys .section-head .ttl,
+  .stack .section-head .ttl{border-top-color:var(--bone)}
+
+  /* live-sys: kill the long lede + meta-strip + diag-title + status grid */
+  .live-sys .lede-row{display:none}
+  .diag .diag-title,
+  .diag .diag-svg,
+  .diag .diag-status{display:none}
+  .diag{padding:1.6rem 1.3rem}
+
+  /* tech: hide intro paragraph + stat numbers (keep "and a few more" line) */
+  .stack .tech-intro{display:none}
+  .tech-foot{margin-top:2rem;padding-top:1.2rem}
+  .tech-foot .nums{display:none}
+  .tech-foot .more{font-size:.58rem}
+
+  /* services: kill the lede paragraph + decorative seal */
+  .services .head-row{display:none}
+
+  /* testimonial right-meta already hidden ≤780px — leave it */
+}
+
+/* ─────────────────────────────  MOBILE · DIAG POSTER (≤720px)  ───────────────────────────── */
+.diag-poster{display:none}
+@media (max-width:720px){
+  .diag-poster{
+    display:flex;flex-direction:column;gap:1rem;
+    position:relative;z-index:2;
+    padding:.4rem .2rem;
+  }
+  .diag-poster .dp-head{
+    display:inline-flex;align-items:center;gap:.55rem;
+    font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--grey-2);
+  }
+  .diag-poster .dp-dot{
+    width:7px;height:7px;border-radius:50%;background:#5dde8a;
+    box-shadow:0 0 8px #5dde8a;animation:liveSysBlink 1.6s ease-in-out infinite;
+  }
+  .diag-poster .dp-big{
+    display:flex;align-items:baseline;flex-wrap:wrap;gap:.55rem;
+    font-family:var(--serif);font-style:italic;color:var(--bone);
+    font-size:clamp(2.1rem, 9vw, 2.8rem);line-height:1;letter-spacing:-.02em;
+  }
+  .diag-poster .dp-big .dp-status{color:#5dde8a;font-style:normal;font-family:var(--mono);
+    font-size:.55em;letter-spacing:.08em;}
+  .diag-poster .dp-big .dp-tag{font-style:normal;font-family:var(--mono);
+    font-size:.42em;letter-spacing:.18em;color:#5dde8a;text-transform:uppercase;
+    margin-left:-.3em;opacity:.85;}
+  .diag-poster .dp-big .dp-sep{color:var(--grey-2);font-style:normal;opacity:.4}
+  .diag-poster .dp-big .dp-ms b{color:var(--accent);font-style:normal;font-weight:400}
+  .diag-poster .dp-meta{
+    display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;
+    font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+    color:rgba(255,255,255,.78);
+  }
+  .diag-poster .dp-meta .dp-d{color:var(--accent);opacity:.7}
+  .diag-poster .dp-foot{
+    margin-top:.4rem;padding-top:.8rem;border-top:1px dashed rgba(255,255,255,.12);
+    font-family:var(--mono);font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--grey-2);line-height:1.6;
+  }
+  .diag-poster .dp-foot .arr{color:var(--accent)}
+}
+
+/* ─────────────────────────────  MOBILE · TECH TABS (≤720px)  ───────────────────────────── */
+.tech-tabs{display:none}
+@media (max-width:720px){
+  /* override the horizontal-rail behavior from the fresh shell — tabs handle density now */
+  .tech-grid{
+    flex-wrap:wrap !important;overflow-x:visible !important;
+    margin-left:0 !important;margin-right:0 !important;
+    padding:0 !important;gap:.55rem !important;
+    scroll-snap-type:none !important;
+  }
+
+  /* tabs strip — horizontal, scroll-snap, monospaced */
+  .tech-tabs{
+    display:flex;gap:.4rem;overflow-x:auto;scrollbar-width:none;
+    margin:0 calc(var(--gutter) * -1) 1.4rem;
+    padding:.2rem var(--gutter) .8rem;
+    -webkit-overflow-scrolling:touch;
+    scroll-snap-type:x proximity;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .tech-tabs::-webkit-scrollbar{display:none}
+  .tt{
+    flex-shrink:0;scroll-snap-align:start;
+    font-family:var(--mono);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;
+    padding:.55rem .85rem;border-radius:99px;
+    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);
+    color:rgba(255,255,255,.6);cursor:pointer;
+    transition:color .2s ease, background .2s ease, border-color .2s ease;
+    display:inline-flex;align-items:center;gap:.45rem;
+  }
+  .tt .tt-n{color:rgba(255,255,255,.32);font-size:.5rem}
+  .tt:active{transform:scale(.96)}
+  .tt.is-active{
+    color:#fff;background:var(--accent);border-color:var(--accent);
+    box-shadow:0 6px 14px -6px rgba(255,77,28,.55);
+  }
+  .tt.is-active .tt-n{color:rgba(255,255,255,.65)}
+
+  /* show only the active tech-group on mobile; default-show first */
+  .tech-group{display:none;margin-bottom:0}
+  .tech-group.is-active{display:block}
+}
 </style>
 </head>
 <body>
@@ -2349,6 +2464,25 @@ body.cs-locked{overflow:hidden}
     <span class="corner tl"></span><span class="corner tr"></span>
     <span class="corner bl"></span><span class="corner br"></span>
     <div class="diag-title"><span class="dot"></span>POST /api/payment/verify · live trace</div>
+
+    <!-- Mobile-only poster — replaces SVG below 720px -->
+    <div class="diag-poster" aria-hidden="true">
+      <div class="dp-head">
+        <span class="dp-dot"></span>
+        POST /api/payment/verify
+      </div>
+      <div class="dp-big">
+        <span class="dp-status">200</span><span class="dp-tag">OK</span>
+        <span class="dp-sep">·</span>
+        <span class="dp-ms"><b>14</b>ms</span>
+      </div>
+      <div class="dp-meta">
+        <span>JWT</span><span class="dp-d">·</span><span>RBAC</span><span class="dp-d">·</span><span>HMAC SHA256</span>
+      </div>
+      <div class="dp-foot">
+        Browser <span class="arr">→</span> Nginx <span class="arr">→</span> Spring Boot <span class="arr">→</span> Postgres / Razorpay
+      </div>
+    </div>
 
     <svg class="diag-svg" viewBox="0 0 1200 320" xmlns="http://www.w3.org/2000/svg">
       <!-- connection paths (drawn first so they sit behind nodes) -->
@@ -2600,6 +2734,9 @@ body.cs-locked{overflow:hidden}
   <p class="tech-intro">
     Over five years across enterprise and freelance work, this is the kit I trust to ship — <em>tools that survive production</em>, not just demos. Hover any badge.
   </p>
+
+  <!-- Mobile-only tab strip — populated by JS, only renders ≤720px -->
+  <div class="tech-tabs" role="tablist" aria-label="Tech stack categories" id="techTabs"></div>
 
   <!-- Languages -->
   <div class="tech-group" data-tech-group>
@@ -3302,6 +3439,44 @@ document.querySelectorAll('[data-reveal]').forEach(c=>{
     });
   },{threshold:.18,rootMargin:'0px 0px -8% 0px'});
   groups.forEach(g => tio.observe(g));
+})();
+
+/* ───── Tech tabs (mobile only) ───── */
+(function techTabs(){
+  const tabsEl = document.getElementById('techTabs');
+  const groups = [...document.querySelectorAll('[data-tech-group]')];
+  if(!tabsEl || !groups.length) return;
+
+  const labels = groups.map(g => {
+    const cat = g.querySelector('.tech-cat');
+    if(!cat) return {name:'Group', count:''};
+    const count = (cat.querySelector('.count')?.textContent || '').trim();
+    const name = cat.firstChild?.textContent?.trim() || cat.textContent.replace(count,'').trim();
+    return {name, count};
+  });
+
+  tabsEl.innerHTML = labels.map((l,i)=>
+    `<button type="button" class="tt${i===1?' is-active':''}" role="tab" data-idx="${i}">
+      <span class="tt-l">${l.name}</span>${l.count?`<span class="tt-n">${l.count}</span>`:''}
+    </button>`
+  ).join('');
+
+  // default-active: index 1 = Backend (most relevant for a Java dev)
+  const defaultIdx = Math.min(1, groups.length - 1);
+  groups.forEach((g,i)=> g.classList.toggle('is-active', i===defaultIdx));
+
+  tabsEl.addEventListener('click', e=>{
+    const btn = e.target.closest('.tt');
+    if(!btn) return;
+    const idx = +btn.dataset.idx;
+    tabsEl.querySelectorAll('.tt').forEach((b,i)=> b.classList.toggle('is-active', i===idx));
+    groups.forEach((g,i)=> {
+      const on = i===idx;
+      g.classList.toggle('is-active', on);
+      // re-trigger badge stagger when a group becomes visible
+      if(on){ g.classList.remove('in'); requestAnimationFrame(()=>g.classList.add('in')); }
+    });
+  });
 })();
 
 /* ───── Hero parallax ───── */
