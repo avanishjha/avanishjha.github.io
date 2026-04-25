@@ -1359,6 +1359,237 @@ button.card{
   .tl-card{padding:.4rem 0 0 0}
 }
 
+/* ─────────────────────────────  CV / RÉSUMÉ MODAL  ───────────────────────────── */
+.cv-shell{
+  position:fixed;inset:0;z-index:9400;display:flex;
+  background:rgba(10,10,10,.72);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  align-items:flex-start;justify-content:center;
+  overflow-y:auto;
+  pointer-events:none;visibility:hidden;
+  --cvx:50%;--cvy:50%;
+  clip-path:circle(0 at var(--cvx) var(--cvy));
+  -webkit-clip-path:circle(0 at var(--cvx) var(--cvy));
+  transition:clip-path .9s cubic-bezier(.7,0,.18,1),
+             -webkit-clip-path .9s cubic-bezier(.7,0,.18,1),
+             background-color .35s linear,
+             visibility 0s linear .9s;
+}
+.cv-shell.open{
+  pointer-events:auto;visibility:visible;
+  clip-path:circle(160% at var(--cvx) var(--cvy));
+  -webkit-clip-path:circle(160% at var(--cvx) var(--cvy));
+  transition:clip-path .95s cubic-bezier(.16,1,.3,1),
+             -webkit-clip-path .95s cubic-bezier(.16,1,.3,1),
+             background-color .45s linear,
+             visibility 0s;
+}
+.cv-paper{
+  position:relative;width:min(1080px, 92vw);
+  margin:6vh 0 8vh;
+  background:var(--bone);color:var(--ink);
+  border:1px solid var(--hair);
+  border-radius:14px;
+  transform:scale(.94) translateY(28px);opacity:0;
+  transition:transform .85s cubic-bezier(.16,1,.3,1) .15s,
+             opacity .55s ease .2s;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.4) inset,
+    0 40px 80px -32px rgba(10,10,10,.55),
+    0 12px 28px -16px rgba(10,10,10,.4);
+  padding:clamp(2rem, 5vw, 4.2rem);
+}
+.cv-shell.open .cv-paper{transform:scale(1) translateY(0);opacity:1}
+.cv-close{
+  position:absolute;top:1.4rem;right:1.4rem;z-index:5;
+  width:42px;height:42px;border-radius:50%;
+  background:var(--paper);border:1px solid var(--hair);
+  display:grid;place-items:center;cursor:pointer;
+  transition:background .35s, border-color .35s, transform .55s var(--ease);
+}
+.cv-close:hover{background:var(--ink);border-color:var(--ink);transform:rotate(90deg)}
+.cv-close svg{width:14px;height:14px;stroke:var(--ink);transition:stroke .35s;fill:none;stroke-width:1.6}
+.cv-close:hover svg{stroke:var(--bone)}
+.cv-hd{
+  display:grid;grid-template-columns:1.4fr 1fr;gap:2.4rem;align-items:end;
+  padding-bottom:2rem;border-bottom:1px solid var(--hair);
+  margin-bottom:2.6rem;
+}
+.cv-hd .num{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--grey);
+  display:inline-flex;align-items:center;gap:.7rem;margin-bottom:1rem;
+}
+.cv-hd .num::before{content:'';width:1.6rem;height:1px;background:var(--ink);opacity:.4}
+.cv-hd h2{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(2.6rem, 5.6vw, 4.6rem);
+  line-height:.95;letter-spacing:-.025em;color:var(--ink);
+  margin:0 0 .35rem;
+}
+.cv-hd h2 em{font-style:italic;color:var(--accent)}
+.cv-hd .role{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(1.05rem, 1.5vw, 1.3rem);color:var(--ink-soft);
+  letter-spacing:-.005em;margin:0;
+}
+.cv-hd .strip{
+  display:flex;flex-direction:column;gap:.45rem;
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);
+  text-align:right;
+}
+.cv-hd .strip a{color:var(--ink);transition:color .25s ease;border-bottom:1px dashed transparent}
+.cv-hd .strip a:hover{color:var(--accent);border-bottom-color:rgba(255,77,28,.35)}
+
+.cv-section{margin-bottom:2.6rem}
+.cv-section:last-of-type{margin-bottom:0}
+.cv-num{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.28em;text-transform:uppercase;color:var(--grey);
+  display:inline-flex;align-items:center;gap:.7rem;margin-bottom:1.1rem;
+}
+.cv-num::before{content:'';width:1.6rem;height:1px;background:var(--ink);opacity:.4}
+.cv-section h3{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(1.6rem, 2.4vw, 2rem);
+  line-height:1.05;letter-spacing:-.018em;color:var(--ink);
+  margin:0 0 1rem;
+}
+.cv-section h3 em{font-style:italic;color:var(--accent)}
+.cv-section p{
+  font-family:var(--serif);font-size:1.02rem;line-height:1.65;color:var(--ink-soft);
+  max-width:62ch;margin:0;
+}
+.cv-section p + p{margin-top:.8rem}
+.cv-section p strong{color:var(--ink);font-weight:600}
+.cv-section p em{font-style:italic;color:var(--accent)}
+
+.cv-job{
+  display:grid;grid-template-columns:auto 1fr;gap:2rem;
+  padding:1.4rem 0;border-bottom:1px dashed var(--hair-2);
+}
+.cv-job:last-child{border-bottom:none;padding-bottom:0}
+.cv-job:first-of-type{padding-top:0}
+.cv-job .when{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--grey);
+  display:flex;flex-direction:column;gap:.35rem;min-width:9rem;
+}
+.cv-job .when .yr{color:var(--ink);font-size:.7rem}
+.cv-job .when .loc{color:var(--grey)}
+.cv-job .body{display:flex;flex-direction:column;gap:.7rem;min-width:0}
+.cv-job .body h4{
+  font-family:var(--serif);font-weight:400;font-size:1.3rem;line-height:1.15;color:var(--ink);
+  margin:0;letter-spacing:-.012em;
+}
+.cv-job .body h4 em{font-style:italic;color:var(--accent)}
+.cv-job .body .where{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--grey-2);
+}
+.cv-job .body p{font-size:.98rem;line-height:1.6}
+.cv-job .body ul{
+  display:flex;flex-direction:column;gap:.5rem;list-style:none;padding:0;margin:.3rem 0 0;
+}
+.cv-job .body ul li{
+  font-family:var(--serif);font-size:.96rem;line-height:1.55;color:var(--ink-soft);
+  display:flex;align-items:flex-start;gap:.7rem;
+}
+.cv-job .body ul li::before{
+  content:'';margin-top:.55rem;width:4px;height:4px;border-radius:50%;
+  background:var(--accent);flex-shrink:0;
+}
+.cv-job .body ul li strong{color:var(--ink);font-weight:600}
+.cv-job .body .tags{
+  display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem;
+}
+.cv-job .body .tags span{
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:.32rem .55rem;border-radius:99px;border:1px solid var(--hair-2);
+  background:rgba(10,10,10,.03);color:var(--grey);
+}
+
+.cv-skills{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem 2rem;
+  margin-top:.4rem;
+}
+.cv-skills .skl{
+  display:flex;flex-direction:column;gap:.55rem;
+  padding:1.1rem 1.3rem;background:var(--paper);
+  border:1px solid var(--hair);border-radius:10px;
+}
+.cv-skills .skl .k{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--grey);
+  display:flex;align-items:center;gap:.6rem;
+}
+.cv-skills .skl .k::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.cv-skills .skl .v{
+  font-family:var(--serif);font-size:1rem;line-height:1.5;color:var(--ink);letter-spacing:-.005em;
+}
+.cv-skills .skl .v em{font-style:italic;color:var(--accent)}
+
+.cv-edu{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;
+}
+.cv-edu .item{
+  padding:1.2rem 1.3rem;background:var(--paper);
+  border:1px solid var(--hair);border-radius:10px;
+  display:flex;flex-direction:column;gap:.45rem;
+}
+.cv-edu .item .yr{
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--grey);
+}
+.cv-edu .item h4{
+  font-family:var(--serif);font-weight:400;font-size:1.15rem;line-height:1.2;color:var(--ink);
+  margin:0;letter-spacing:-.012em;
+}
+.cv-edu .item h4 em{font-style:italic;color:var(--accent)}
+.cv-edu .item .det{
+  font-family:var(--serif);font-size:.95rem;line-height:1.5;color:var(--ink-soft);margin:0;
+}
+
+.cv-ft{
+  display:flex;justify-content:space-between;align-items:center;gap:1.5rem;flex-wrap:wrap;
+  margin-top:2.4rem;padding-top:1.4rem;border-top:1px dashed var(--hair-2);
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--grey);
+}
+.cv-ft .actions{display:inline-flex;gap:.7rem;flex-wrap:wrap}
+.cv-ft .actions a{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.7rem 1rem;border-radius:99px;border:1px solid var(--hair);
+  color:var(--ink);background:transparent;
+  transition:background .3s, color .3s, border-color .3s, transform .3s;
+}
+.cv-ft .actions a:hover{background:var(--ink);color:var(--bone);border-color:var(--ink);transform:translateY(-2px)}
+.cv-ft .actions a.fill{background:var(--ink);color:var(--bone);border-color:var(--ink)}
+.cv-ft .actions a.fill:hover{background:var(--accent);border-color:var(--accent)}
+.cv-ft .actions a svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.6}
+
+@media (max-width:860px){
+  .cv-paper{padding:clamp(1.6rem, 5vw, 2.4rem)}
+  .cv-hd{grid-template-columns:1fr;gap:1.2rem;align-items:start}
+  .cv-hd .strip{text-align:left;align-items:flex-start}
+  .cv-job{grid-template-columns:1fr;gap:.8rem}
+  .cv-job .when{flex-direction:row;flex-wrap:wrap;gap:.7rem;min-width:0}
+  .cv-skills,.cv-edu{grid-template-columns:1fr}
+  .cv-ft{justify-content:center;text-align:center}
+}
+
+@media print{
+  body > *:not(.cv-shell){display:none !important}
+  .cv-shell{
+    position:static !important;
+    background:#fff !important;
+    backdrop-filter:none !important;-webkit-backdrop-filter:none !important;
+    clip-path:none !important;-webkit-clip-path:none !important;
+    visibility:visible !important;pointer-events:auto !important;
+    overflow:visible !important;display:block !important;
+  }
+  .cv-paper{
+    transform:none !important;opacity:1 !important;
+    box-shadow:none !important;border:none !important;
+    margin:0 !important;width:100% !important;max-width:100% !important;
+    padding:1cm !important;
+  }
+  .cv-close,.cv-ft{display:none !important}
+}
+
 /* ─────────────────────────────  CONTACT  ───────────────────────────── */
 .contact{background:var(--ink);color:var(--bone);padding:var(--pad-y-xl) var(--gutter) var(--pad-y-l)}
 .contact .label{font-family:var(--mono);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--grey-2);margin-bottom:3rem;display:flex;align-items:center;gap:.7rem}
@@ -2048,9 +2279,9 @@ body.cs-locked{overflow:hidden}
       <div class="cta-row">
         <a class="primary" href="#work" data-cur>View work <span class="arr">↗</span></a>
         <a href="#contact" data-cur>Get in touch <span class="arr">↗</span></a>
-        <a class="ghost" href="Avanish_Jha_Fullstack_Developer Resume.pdf" download data-cur>
-          <svg class="dl-ic" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1v9m0 0L3 6m4 4l4-4M2 13h10"/></svg>
-          Download CV
+        <a class="ghost" href="#" id="viewCvBtn" data-cur>
+          <svg class="dl-ic" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h10M2 7h10M2 10h6M11 13l3-3-3-3"/></svg>
+          View CV
         </a>
       </div>
     </div>
@@ -2573,6 +2804,197 @@ body.cs-locked{overflow:hidden}
     </div>
   </div>
 </section>
+
+<!-- CV / RÉSUMÉ MODAL — opens via View CV button -->
+<div class="cv-shell" id="cvShell" role="dialog" aria-modal="true" aria-labelledby="cvTitle" aria-hidden="true">
+  <article class="cv-paper">
+    <button type="button" class="cv-close" id="cvClose" aria-label="Close CV" data-cur>
+      <svg viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12"/></svg>
+    </button>
+    <header class="cv-hd">
+      <div>
+        <div class="num">— Curriculum Vitæ — Vol. 04 · MMXXVI</div>
+        <h2 id="cvTitle">Avanish <em>Jha</em>.</h2>
+        <p class="role">Java Full Stack Developer · Mumbai, India</p>
+      </div>
+      <div class="strip">
+        <a href="mailto:avanishjha2011@gmail.com" data-cur>avanishjha2011@gmail.com</a>
+        <span>+91 80107 01354</span>
+        <a href="https://github.com/avanishjha" target="_blank" rel="noopener" data-cur>github.com/avanishjha ↗</a>
+        <a href="https://linkedin.com/in/avanishjha" target="_blank" rel="noopener" data-cur>linkedin.com/in/avanishjha ↗</a>
+      </div>
+    </header>
+
+    <!-- 01 · Profile -->
+    <div class="cv-section">
+      <div class="cv-num">01 · Profile</div>
+      <h3>Backend-first <em>full-stack</em> engineer.</h3>
+      <p>
+        Java Full Stack Developer building production systems at <strong>CMS Computers India</strong> by day, and shipping freelance products for <strong>Fifty Villagers</strong>, <strong>Prince Ambulance</strong>, and <strong>PoolUp</strong> by night. I design <em>REST APIs</em> that hold up at 3am, <em>RBAC</em> that survives a real audit, and frontends that don't ship a megabyte of JavaScript.
+      </p>
+      <p>
+        From system architecture to the last edge case — schema, security, deploy, and the boring CI/CD pipe — <em>I own the whole thing</em>. Open to freelance and full-time roles for 2026.
+      </p>
+    </div>
+
+    <!-- 02 · Experience -->
+    <div class="cv-section">
+      <div class="cv-num">02 · Experience</div>
+
+      <div class="cv-job">
+        <div class="when">
+          <span class="yr">Aug 2024 — Now</span>
+          <span class="loc">Mumbai · On-site</span>
+        </div>
+        <div class="body">
+          <h4>Java Full Stack Developer <em>— CMS Computers India Pvt. Ltd.</em></h4>
+          <span class="where">Enterprise · Incident Management System (IMS)</span>
+          <ul>
+            <li>Owned <strong>Designation Management</strong>, <strong>Escalation Report</strong>, and <strong>Hierarchy &amp; Zone Mapping</strong> modules end-to-end with full RBAC.</li>
+            <li>Hardened <strong>SecurityConfig.java</strong> with Keycloak-backed JWT auth, role-scoped endpoints, and CSRF/CORS policy aligned to enterprise requirements.</li>
+            <li>Reduced API response times by <strong>~30%</strong> through Hibernate query tuning, N+1 fixes, lazy-fetch refactors, and serialisation optimisations.</li>
+            <li>Shipped enterprise reporting via <strong>JasperReports</strong>; integrated against MySQL with multi-schema migrations and audit logging.</li>
+            <li>Contributed to the <strong>Energy Meter Configuration Portal</strong> — a separate angular module under the same platform.</li>
+          </ul>
+          <div class="tags"><span>Spring Boot</span><span>Hibernate</span><span>Angular</span><span>MySQL</span><span>Keycloak</span><span>JasperReports</span><span>RBAC</span></div>
+        </div>
+      </div>
+
+      <div class="cv-job">
+        <div class="when">
+          <span class="yr">2024 — Live</span>
+          <span class="loc">Freelance · Remote</span>
+        </div>
+        <div class="body">
+          <h4>Freelance Full Stack <em>— Fifty Villagers</em></h4>
+          <span class="where">Education NGO · PERN-stack SaaS</span>
+          <ul>
+            <li>Designed and shipped a production education platform with <strong>multi-tier RBAC</strong>, JWT refresh-token auth, and rate-limited public endpoints.</li>
+            <li>Integrated <strong>Razorpay</strong> with HMAC-verified webhooks, idempotent payment handling, and an audit-friendly transaction ledger.</li>
+            <li>Authored a <strong>17-migration Postgres schema</strong> with tracked audit logs across user, course, payment, and admin tables.</li>
+            <li>Deployed on a hardened VPS via <strong>Docker</strong>, <strong>Nginx</strong>, SSL/TLS, and <strong>GitHub Actions</strong> CI/CD with zero-downtime releases.</li>
+          </ul>
+          <div class="tags"><span>PERN</span><span>PostgreSQL</span><span>JWT</span><span>Razorpay</span><span>Docker</span><span>Nginx</span><span>GitHub Actions</span></div>
+        </div>
+      </div>
+
+      <div class="cv-job">
+        <div class="when">
+          <span class="yr">2026</span>
+          <span class="loc">Freelance · Remote</span>
+        </div>
+        <div class="body">
+          <h4>Freelance Web <em>— Prince Ambulance Services</em></h4>
+          <span class="where">Healthcare · Mobile-first booking site</span>
+          <ul>
+            <li>Designed and shipped <strong>princeambulanceservices.in.net</strong> — a fast-loading, mobile-first booking surface for an emergency healthcare service that needs to convert in seconds.</li>
+            <li>Conversion-focused single-page funnel with structured data, semantic markup, and sub-second LCP on 4G.</li>
+          </ul>
+          <div class="tags"><span>Next.js</span><span>SEO</span><span>Mobile-first</span><span>Performance</span></div>
+        </div>
+      </div>
+
+      <div class="cv-job">
+        <div class="when">
+          <span class="yr">2026 — Building</span>
+          <span class="loc">Self-initiated</span>
+        </div>
+        <div class="body">
+          <h4>Founder · Engineer <em>— PoolUp</em></h4>
+          <span class="where">Fintech · Group trip pools with escrow</span>
+          <ul>
+            <li>Building a group-trip payments product on <strong>Razorpay Route</strong> with RBI/DPDP-aligned compliance and a double-entry ledger.</li>
+            <li>Researching <strong>PPI vs escrow</strong> for the funding flow; designing the v2.0 platform on Spring Boot + Next.js.</li>
+          </ul>
+          <div class="tags"><span>Spring Boot</span><span>Razorpay Route</span><span>Postgres</span><span>RBI · DPDP</span><span>Next.js</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 · Skills -->
+    <div class="cv-section">
+      <div class="cv-num">03 · Skills</div>
+      <div class="cv-skills">
+        <div class="skl">
+          <span class="k">Backend</span>
+          <span class="v"><em>Spring Boot</em>, Hibernate / JPA, Node.js, Express, REST API design, JWT &amp; Keycloak auth, RBAC, HMAC webhooks, JasperReports.</span>
+        </div>
+        <div class="skl">
+          <span class="k">Frontend</span>
+          <span class="v"><em>Angular</em>, Next.js, React, TypeScript, semantic HTML, accessible CSS, performance budgets.</span>
+        </div>
+        <div class="skl">
+          <span class="k">Databases</span>
+          <span class="v"><em>PostgreSQL</em>, MySQL, MongoDB. Migrations, audit logs, query tuning, schema design under compliance.</span>
+        </div>
+        <div class="skl">
+          <span class="k">DevOps &amp; Tools</span>
+          <span class="v"><em>Docker</em>, Nginx, GitHub Actions, Jenkins, Maven, Postman, IntelliJ IDEA, VS Code, Git.</span>
+        </div>
+        <div class="skl">
+          <span class="k">Languages</span>
+          <span class="v"><em>Java</em>, JavaScript, TypeScript, Python, HTML, CSS.</span>
+        </div>
+        <div class="skl">
+          <span class="k">Domains</span>
+          <span class="v"><em>Payments</em> (Razorpay), Auth &amp; Identity, Enterprise reporting, Compliance (RBI / DPDP), Performance engineering.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 · Education -->
+    <div class="cv-section">
+      <div class="cv-num">04 · Education</div>
+      <div class="cv-edu">
+        <div class="item">
+          <span class="yr">2020 — 2024</span>
+          <h4>B.Tech, Electrical &amp; Computer Engineering <em>— Amrita Vishwa Vidyapeetham</em></h4>
+          <p class="det">CGPA <strong>7.86 / 10.00</strong>. Coursework spanning electronics, computer architecture, algorithms, and operating systems.</p>
+        </div>
+        <div class="item">
+          <span class="yr">2025 — Ongoing</span>
+          <h4>AI / ML Foundation <em>— IIT Madras</em></h4>
+          <p class="det">Foundation programme covering ML fundamentals, applied statistics, and Python-based modelling.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 · Certifications -->
+    <div class="cv-section">
+      <div class="cv-num">05 · Certifications</div>
+      <div class="cv-edu">
+        <div class="item">
+          <span class="yr">Udemy</span>
+          <h4>Java Full Stack <em>Development</em></h4>
+          <p class="det">End-to-end Java + Spring Boot + frontend integration with deployment workflows.</p>
+        </div>
+        <div class="item">
+          <span class="yr">Coursera</span>
+          <h4>Spring Boot <em>Microservices</em></h4>
+          <p class="det">Service decomposition, inter-service auth, resilience patterns, and observability.</p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="cv-ft">
+      <span>Last updated · Apr 2026 · Vol. 04 / MMXXVI</span>
+      <div class="actions">
+        <a href="Avanish_Jha_Fullstack_Developer Resume.pdf" download data-cur>
+          <svg viewBox="0 0 14 14"><path d="M7 1v9m0 0L3 6m4 4l4-4M2 13h10"/></svg>
+          Download PDF
+        </a>
+        <a href="#" onclick="window.print();return false;" data-cur>
+          <svg viewBox="0 0 14 14"><path d="M3 5V1h8v4M3 11H1v-5h12v5h-2M3 9h8v4H3z"/></svg>
+          Print
+        </a>
+        <a class="fill" href="mailto:avanishjha2011@gmail.com" data-cur>
+          <svg viewBox="0 0 14 14"><path d="M1 3l6 4 6-4M1 3v8h12V3M1 3l6-2 6 2"/></svg>
+          Hire me
+        </a>
+      </div>
+    </footer>
+  </article>
+</div>
 
 <!-- CONTACT -->
 <section class="contact" id="contact">
@@ -3522,6 +3944,51 @@ const CS = {
         y = r.top + r.height/2;
       }
       open(key, x, y);
+    });
+  });
+  closeBtn.addEventListener('click', close);
+  shell.addEventListener('click', e=>{ if(e.target===shell) close(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && shell.classList.contains('open')) close(); });
+})();
+
+/* ───── CV modal (radial expand from View CV button) ───── */
+(function cvInit(){
+  const shell = document.getElementById('cvShell');
+  const closeBtn = document.getElementById('cvClose');
+  if(!shell || !closeBtn) return;
+
+  function open(originX, originY){
+    const x = (typeof originX === 'number') ? originX : innerWidth/2;
+    const y = (typeof originY === 'number') ? originY : innerHeight/2;
+    shell.style.setProperty('--cvx', x + 'px');
+    shell.style.setProperty('--cvy', y + 'px');
+    document.body.classList.add('cs-locked');
+    shell.scrollTop = 0;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      shell.classList.add('open');
+      shell.setAttribute('aria-hidden','false');
+      closeBtn.focus({preventScroll:true});
+    }));
+  }
+  function close(){
+    const r = closeBtn.getBoundingClientRect();
+    shell.style.setProperty('--cvx', (r.left + r.width/2) + 'px');
+    shell.style.setProperty('--cvy', (r.top + r.height/2) + 'px');
+    shell.classList.remove('open');
+    shell.setAttribute('aria-hidden','true');
+    document.body.classList.remove('cs-locked');
+  }
+
+  // any element with [data-open-cv] (e.g. View CV button) triggers the modal
+  document.querySelectorAll('#viewCvBtn, [data-open-cv]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      e.preventDefault();
+      let x = e.clientX, y = e.clientY;
+      if(!x && !y){
+        const r = el.getBoundingClientRect();
+        x = r.left + r.width/2; y = r.top + r.height/2;
+      }
+      open(x, y);
     });
   });
   closeBtn.addEventListener('click', close);
