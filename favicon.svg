@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="7" fill="#0a0a0a"/>
+  <!-- paper grain dots -->
+  <rect width="32" height="32" rx="7" fill="url(#g)" opacity=".35"/>
+  <defs>
+    <pattern id="g" width="4" height="4" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r=".5" fill="#efece4"/>
+    </pattern>
+  </defs>
+  <!-- italic A -->
+  <text x="5" y="26" font-family="Georgia,'Times New Roman',serif" font-style="italic" font-size="26" font-weight="400" fill="#efece4">A</text>
+  <!-- accent dot -->
+  <circle cx="26" cy="9" r="4" fill="#ff4d1c"/>
+  <circle cx="26" cy="9" r="6.5" fill="none" stroke="#ff4d1c" stroke-width="1" opacity=".35"/>
+</svg>

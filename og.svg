@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r=".9" fill="#efece4" opacity=".06"/>
+    </pattern>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#efece4" stroke-width=".6" opacity=".04"/>
+    </pattern>
+    <radialGradient id="fade" cx="72%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#1a1209" stop-opacity=".0"/>
+      <stop offset="100%" stop-color="#0a0a0a" stop-opacity=".7"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff4d1c" stop-opacity=".12"/>
+      <stop offset="100%" stop-color="#ff4d1c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- base -->
+  <rect width="1200" height="630" fill="#0a0a0a"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- right-side accent glow ring cluster -->
+  <circle cx="980" cy="315" r="220" fill="url(#glow)"/>
+  <circle cx="980" cy="315" r="195" fill="none" stroke="#ff4d1c" stroke-width="1" opacity=".07"/>
+  <circle cx="980" cy="315" r="140" fill="none" stroke="#ff4d1c" stroke-width="1" opacity=".1"/>
+  <circle cx="980" cy="315" r="75"  fill="none" stroke="#ff4d1c" stroke-width="1" opacity=".14"/>
+  <circle cx="980" cy="315" r="6"   fill="#ff4d1c" opacity=".9"/>
+
+  <!-- radial vignette to focus left -->
+  <rect width="1200" height="630" fill="url(#fade)"/>
+
+  <!-- left accent strip -->
+  <rect x="0" y="0" width="4" height="630" fill="#ff4d1c" opacity=".9"/>
+
+  <!-- top meta strip -->
+  <text x="72" y="60"
+    font-family="'Courier New',Courier,monospace"
+    font-size="13" letter-spacing="4" fill="#efece4" opacity=".3"
+    text-transform="uppercase">
+    VOL. 04 · MMXXVI · MUMBAI
+  </text>
+  <text x="1130" y="60"
+    font-family="'Courier New',Courier,monospace"
+    font-size="13" letter-spacing="3" fill="#efece4" opacity=".25"
+    text-anchor="end">
+    A · J
+  </text>
+
+  <!-- dashed rule under meta -->
+  <line x1="72" y1="76" x2="560" y2="76" stroke="#efece4" stroke-width=".8" stroke-dasharray="4 6" opacity=".12"/>
+
+  <!-- name block -->
+  <text x="68" y="282"
+    font-family="Georgia,'Times New Roman',Times,serif"
+    font-size="148" font-style="italic" font-weight="400"
+    fill="#efece4" letter-spacing="-3">
+    Avanish
+  </text>
+  <text x="68" y="418"
+    font-family="Georgia,'Times New Roman',Times,serif"
+    font-size="148" font-style="italic" font-weight="400"
+    fill="#ff4d1c" letter-spacing="-3">
+    Jha.
+  </text>
+
+  <!-- role line -->
+  <text x="72" y="476"
+    font-family="'Courier New',Courier,monospace"
+    font-size="15" letter-spacing="5" fill="#efece4" opacity=".45">
+    JAVA FULL STACK DEVELOPER
+  </text>
+
+  <!-- divider -->
+  <line x1="72" y1="500" x2="500" y2="500" stroke="#efece4" stroke-width=".8" opacity=".1"/>
+
+  <!-- tech tags -->
+  <text x="72" y="526"
+    font-family="'Courier New',Courier,monospace"
+    font-size="13" letter-spacing="3.5" fill="#ff4d1c" opacity=".55">
+    SPRING BOOT · PERN · ANGULAR · DOCKER · CI/CD
+  </text>
+
+  <!-- url bottom right -->
+  <text x="1130" y="590"
+    font-family="'Courier New',Courier,monospace"
+    font-size="13" letter-spacing="2" fill="#efece4" opacity=".25"
+    text-anchor="end">
+    avanishjha.dev
+  </text>
+</svg>
