@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Avanish Jha — Java Full Stack Developer · Spring Boot, Angular, Next.js</title>
-<meta name="description" content="Java Full Stack Developer in Mumbai. Spring Boot APIs, Angular & Next.js dashboards, hardened RBAC and Razorpay-grade payment flows. Building production systems at CMS Computers and Fifty Villagers. Open to freelance · 2026." />
+<meta name="description" content="Java full stack developer in Mumbai — Spring Boot APIs, Angular &amp; Next.js dashboards, hardened RBAC and Razorpay payment flows. Open to freelance, 2026." />
 <meta name="keywords" content="Java Developer, Full Stack, Spring Boot, Angular, Next.js, PostgreSQL, RBAC, Razorpay, Mumbai, Freelance" />
 <meta name="author" content="Avanish Jha" />
 <meta name="theme-color" content="#efece4" />
 <link rel="canonical" href="https://avanishjha.dev" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <link rel="shortcut icon" href="favicon.svg" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="manifest" href="site.webmanifest" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
@@ -27,7 +30,7 @@
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Avanish Jha — Java Full Stack Developer" />
 <meta name="twitter:description" content="Spring Boot systems built to hold up at 3am. Production engineering, RBAC, payments." />
-<meta name="twitter:image" content="https://avanishjha.dev/og.svg" />
+<meta name="twitter:image" content="https://avanishjha.dev/og.png" />
 
 <!-- JSON-LD Structured Data -->
 <script type="application/ld+json">
@@ -65,6 +68,9 @@ a{color:inherit;text-decoration:none}
 ul{list-style:none}
 button{font:inherit;border:none;background:none;cursor:pointer;color:inherit}
 ::selection{background:#ff4d1c;color:#f1ede1}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip-link{position:absolute;left:-9999px;top:0;z-index:2000;background:var(--ink);color:var(--bone);padding:.7rem 1.1rem;border-radius:0 0 .4rem 0;font:500 .8rem/1 'Inter',sans-serif;letter-spacing:.02em}
+.skip-link:focus{left:0}
 
 /* ─────────────────────────────  TOKENS  ───────────────────────────── */
 :root{
@@ -1977,15 +1983,15 @@ body.cs-locked{overflow:hidden}
   .m-cover .eyebrow::before{content:'';width:1.2rem;height:1px;background:var(--ink);opacity:.4}
   .m-cover .eyebrow .accent{color:var(--accent);font-size:.45rem;animation:heroPulse 2s var(--ease) infinite}
 
-  .m-cover h1{
+  .m-cover .m-h1{
     font-family:var(--serif);font-weight:400;
     font-size:clamp(2.6rem, 14.5vw, 4.2rem);
     line-height:.92;letter-spacing:-.03em;color:var(--ink);
     margin:.05rem 0 0;
     word-break:break-word;overflow-wrap:break-word;
   }
-  .m-cover h1 .it{font-style:italic;color:var(--accent)}
-  .m-cover h1 .stroke{-webkit-text-stroke:1.2px var(--ink);color:transparent;font-style:italic}
+  .m-cover .m-h1 .it{font-style:italic;color:var(--accent)}
+  .m-cover .m-h1 .stroke{-webkit-text-stroke:1.2px var(--ink);color:transparent;font-style:italic}
 
   .m-cover .role{
     font-family:var(--serif);font-style:italic;
@@ -2536,6 +2542,7 @@ body.cs-locked{overflow:hidden}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#hero">Skip to content</a>
 
 <div class="cur" id="cur"></div>
 <div class="cur-ring" id="curR"></div>
@@ -2565,7 +2572,7 @@ body.cs-locked{overflow:hidden}
 </nav>
 
 <!-- HERO · EDITORIAL COVER -->
-<header class="hero" id="hero">
+<header class="hero" id="hero" tabindex="-1">
   <div class="hero-grid" aria-hidden="true"></div>
 
   <span class="hero-rail" aria-hidden="true"></span>
@@ -2580,7 +2587,7 @@ body.cs-locked{overflow:hidden}
     <!-- MOBILE EDITORIAL COVER (≤720px only) -->
     <div class="m-cover" aria-hidden="true">
       <div class="eyebrow"><span class="accent">●</span> Vol. 04 · MMXXVI · Mumbai</div>
-      <h1>Avanish<br><span class="it">Jha.</span></h1>
+      <div class="m-h1">Avanish<br><span class="it">Jha.</span></div>
       <p class="role">Java Full Stack Developer — backends, payments, and frontends, <em>shipped</em>.</p>
       <div class="meta">
         <div class="cell">
@@ -2606,7 +2613,7 @@ body.cs-locked{overflow:hidden}
     <div class="hero-left">
       <div class="eyebrow"><span class="accent">●</span> Java Full Stack Developer · Mumbai</div>
 
-      <h1 id="typeH1" aria-label="@Singleton dev. Does it all."><span class="annot">@Singleton</span> dev.<br><span class="it">Does</span> <span class="stroke">it all</span>.</h1>
+      <h1 id="typeH1" aria-label="Avanish Jha — Java full stack developer. Does it all."><span class="sr-only" data-tw-skip>Avanish Jha — Java full stack developer in Mumbai. </span><span class="annot">@Singleton</span> dev.<br><span class="it">Does</span> <span class="stroke">it all</span>.</h1>
 
       <p class="lede">
         I build software the way it <em>should've been built</em> the first time. No duct tape. No shortcuts. No <em>"we'll fix it later."</em>
@@ -3359,7 +3366,7 @@ body.cs-locked{overflow:hidden}
     <footer class="cv-ft">
       <span>Last updated · Apr 2026 · Vol. 04 / MMXXVI</span>
       <div class="actions">
-        <a href="Avanish_Jha_Fullstack_Developer Resume.pdf" download data-cur>
+        <a href="Avanish_Jha_Fullstack_Developer_Resume.pdf" download data-cur>
           <svg viewBox="0 0 14 14"><path d="M7 1v9m0 0L3 6m4 4l4-4M2 13h10"/></svg>
           Download PDF
         </a>
@@ -3394,7 +3401,7 @@ body.cs-locked{overflow:hidden}
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="3" width="12" height="10" rx="1.2"/><path d="M1 6h12M4 1v3M10 1v3"/></svg>
       Book a 15-min call
     </a>
-    <a href="Avanish_Jha_Fullstack_Developer Resume.pdf" download data-cur>
+    <a href="Avanish_Jha_Fullstack_Developer_Resume.pdf" download data-cur>
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7 1v9m0 0L3 6m4 4l4-4M2 13h10"/></svg>
       Download CV (PDF)
     </a>
@@ -3501,7 +3508,7 @@ body.cs-locked{overflow:hidden}
     <span class="arr">↗</span>
   </a>
 
-  <a href="Avanish_Jha_Fullstack_Developer Resume.pdf" download class="row">
+  <a href="Avanish_Jha_Fullstack_Developer_Resume.pdf" download class="row">
     <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 19h14"/></svg></span>
     <span class="lbl">
       <span class="t">Download CV</span>
@@ -3605,6 +3612,7 @@ function typewriter(el, opts={}){
       } else if(child.nodeName === 'BR'){
         items.push({br:true, el:child});
       } else if(child.nodeType === Node.ELEMENT_NODE){
+        if(child.hasAttribute('data-tw-skip')) return;   // keep SEO keyword span out of the typewriter
         walk(child);
       }
     });

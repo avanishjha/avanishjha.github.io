@@ -1,0 +1,16 @@
+{
+  "name": "Avanish Jha — Java Full Stack Developer",
+  "short_name": "Avanish Jha",
+  "description": "Java full stack developer in Mumbai — Spring Boot, Angular, Next.js, hardened RBAC and Razorpay payment flows.",
+  "lang": "en-IN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#efece4",
+  "theme_color": "#efece4",
+  "icons": [
+    { "src": "favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" }
+  ]
+}
