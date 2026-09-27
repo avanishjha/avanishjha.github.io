@@ -1,96 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════════
-   AVANISH JHA — SHOWREEL 2026
-   Deterministic timeline: every frame is a pure function of time `t`,
-   so the renderer can seek to any frame and get an identical image.
-   Music grid: 120 BPM → 1 beat = 0.5s, 1 bar = 2s.
+   AVANISH JHA — SHOWREEL 2026 · 16:9 (1920×1080) scenes
+   Engine, FX and player live in engine.js.
    ═══════════════════════════════════════════════════════════════════ */
 (() => {
 'use strict';
-const $ = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-const FPS = 60, DUR = 30;
-let FR = 0; // current frame index (drives deterministic "randomness")
-let TQ = 0; // frame-quantized time: text & counters change once per frame, never between motion-blur sub-frames
-
-/* ─────────── easing + math ─────────── */
-const E = {
-  lin: x => x,
-  outQuad: x => 1 - (1 - x) * (1 - x),
-  inCubic: x => x * x * x,
-  outCubic: x => 1 - (1 - x) ** 3,
-  inOutCubic: x => x < .5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2,
-  inQuart: x => x ** 4,
-  outQuart: x => 1 - (1 - x) ** 4,
-  inOutQuart: x => x < .5 ? 8 * x ** 4 : 1 - (-2 * x + 2) ** 4 / 2,
-  inExpo: x => x === 0 ? 0 : 2 ** (10 * x - 10),
-  outExpo: x => x === 1 ? 1 : 1 - 2 ** (-10 * x),
-  inOutExpo: x => x === 0 ? 0 : x === 1 ? 1 : x < .5 ? 2 ** (20 * x - 10) / 2 : (2 - 2 ** (-20 * x + 10)) / 2,
-  outBack: x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * (x - 1) ** 3 + c1 * (x - 1) ** 2; },
-  outBackS: x => { const c1 = 2.4, c3 = c1 + 1; return 1 + c3 * (x - 1) ** 3 + c1 * (x - 1) ** 2; },
-  inOutSine: x => -(Math.cos(Math.PI * x) - 1) / 2,
-};
-const cl = (v, a = 0, b = 1) => v < a ? a : v > b ? b : v;
-const lerp = (a, b, p) => a + (b - a) * p;
-const P = (t, s, d, e = E.lin) => e(cl((t - s) / d));
-const bump = (t, s, d) => (t < s || t > s + d) ? 0 : Math.sin(Math.PI * (t - s) / d);
-const decay = (t, s, k) => t < s ? 0 : Math.exp(-(t - s) * k);
-function K(t, keys) {           // keyframes: [time, value, easeIntoThisKey]
-  if (t <= keys[0][0]) return keys[0][1];
-  for (let i = 1; i < keys.length; i++) {
-    const k = keys[i];
-    if (t <= k[0]) { const k0 = keys[i - 1]; return lerp(k0[1], k[1], (k[2] || E.inOutCubic)((t - k0[0]) / (k[0] - k0[0]))); }
-  }
-  return keys[keys.length - 1][1];
-}
-const hash = (a, b = 0) => { let h = (Math.imul(a | 0, 374761393) + Math.imul(b | 0, 668265263)) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
-function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-
-/* ─────────── DOM helpers ─────────── */
-function T(el, o) {
-  let s = '';
-  if (o.x || o.y || o.z) s += o.z ? `translate3d(${(o.x || 0).toFixed(2)}px,${(o.y || 0).toFixed(2)}px,${o.z.toFixed(2)}px) ` : `translate(${(o.x || 0).toFixed(2)}px,${(o.y || 0).toFixed(2)}px) `;
-  if (o.rx) s += `rotateX(${o.rx.toFixed(3)}deg) `;
-  if (o.ry) s += `rotateY(${o.ry.toFixed(3)}deg) `;
-  if (o.r) s += `rotate(${o.r.toFixed(3)}deg) `;
-  if (o.s !== undefined && o.s !== 1) s += `scale(${o.s.toFixed(4)}) `;
-  if (o.sx !== undefined || o.sy !== undefined) s += `scale(${(o.sx ?? 1).toFixed(4)},${(o.sy ?? 1).toFixed(4)}) `;
-  el.style.transform = s || 'none';
-  if (o.o !== undefined) el.style.opacity = o.o < .002 ? 0 : o.o > .998 ? 1 : o.o.toFixed(3);
-  if (o.b !== undefined) el.style.filter = o.b > .05 ? `blur(${o.b.toFixed(2)}px)` : 'none';
-}
-const rise = (el, p, from = 135) => { el.style.transform = p >= 1 ? 'none' : `translateY(${((1 - p) * from).toFixed(2)}%)`; };
-const show = (el, on) => { const v = on ? 'visible' : 'hidden'; if (el._v !== v) { el.style.visibility = v; el._v = v; } };
-const txt = (el, s) => { if (el._t !== s) { el.textContent = s; el._t = s; } };
-const html = (el, s) => { if (el._h !== s) { el.innerHTML = s; el._h = s; } };
-function chars(el, text, cls) {  // wrap each char in a rise mask
-  el.textContent = ''; const out = [];
-  for (const ch of text) {
-    if (ch === ' ') { el.appendChild(document.createTextNode(' ')); continue; }
-    const m = document.createElement('span'); m.className = 'm';
-    const i = document.createElement('i'); i.textContent = ch;
-    if (cls && cls(ch)) i.className = cls(ch);
-    m.appendChild(i); el.appendChild(m); out.push(i);
-  }
-  return out;
-}
-const GLY = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=/<>';
-function scr(text, p, seed = 1) {  // scramble-decode reveal
-  if (p <= 0) return '';
-  if (p >= 1) return text;
-  const n = text.length, L = Math.ceil(Math.min(1, p * 1.7) * n), k = Math.floor(cl((p - .3) / .7) * n);
-  let s = '';
-  for (let i = 0; i < L; i++) {
-    const c = text[i];
-    s += (i < k || c === ' ' || c === '·' || c === '—') ? c : GLY[Math.floor(hash(seed * 7919 + i, Math.floor(FR / 2)) * GLY.length)];
-  }
-  return s;
-}
-const rel = (el, root) => { const a = el.getBoundingClientRect(), b = root.getBoundingClientRect(), k = STAGE_SCALE; return { x: (a.left - b.left) / k, y: (a.top - b.top) / k, w: a.width / k, h: a.height / k }; };
-let STAGE_SCALE = 1;
-
-/* ═══════════════════════════ SCENES ═══════════════════════════ */
-const scenes = [];
-const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, build, render });
+const { RS, E, cl, lerp, P, bump, decay, K, hash, rng, T, rise, show, txt, html, chars, scr, rel, scene, $, $$ } = Reel;
 
 /* ───── S1 · IGNITION (0 – 2.25) ───── */
 {
@@ -111,12 +25,12 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
       const r = R.rings[i], p = P(t, rt, 1.35, E.outCubic), rad = lerp(12, 560 + i * 60, p);
       Object.assign(r.style, { width: 2 * rad + 'px', height: 2 * rad + 'px', left: 960 - rad + 'px', top: 540 - rad + 'px', opacity: t < rt ? 0 : ((1 - p) * .75).toFixed(3) });
     });
-    const msg = 'hello, world', n = Math.floor(cl((TQ - .3) / .05, 0, msg.length));
+    const msg = 'hello, world', n = Math.floor(cl((RS.TQ - .3) / .05, 0, msg.length));
     txt(R.t, msg.slice(0, n));
-    R.caret.style.opacity = (TQ > .3 && TQ < .3 + msg.length * .05) || Math.floor(TQ * 4) % 2 === 0 ? 1 : 0;
+    R.caret.style.opacity = (RS.TQ > .3 && RS.TQ < .3 + msg.length * .05) || Math.floor(RS.TQ * 4) % 2 === 0 ? 1 : 0;
     const ex = P(t, 1.3, .3, E.inCubic);
     T(R.type, { y: -ex * 24, o: P(t, .22, .1) * (1 - ex) });
-    txt(R.sub, scr('avanishjha.dev — est. mumbai', P(TQ, .62, .55), 3));
+    txt(R.sub, scr('avanishjha.dev — est. mumbai', P(RS.TQ, .62, .55), 3));
     T(R.sub, { y: -ex * 24, o: .9 * (1 - ex) });
     const sp = P(t, 1.8, .46, E.inOutExpo);
     T(R.top, { y: -sp * 580 }); T(R.bot, { y: sp * 580 });
@@ -165,7 +79,7 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     if (A) {
       T(R.a, { s: lerp(1, 1.035, P(t, 1.8, 2.2, E.lin)) });
       R.a.style.transformOrigin = '700px 540px';
-      txt(R.kick, scr('[01] — The promise', P(TQ, 2.05, .45), 11));
+      txt(R.kick, scr('[01] — The promise', P(RS.TQ, 2.05, .45), 11));
       const wt = [2.0, 2.08, 2.16, 2.34, 2.42, 2.52, 2.62];
       R.words.forEach((w, i) => {
         const pin = P(t, wt[i], .8, E.outExpo), pout = P(t, 3.64 + i * .025, .3, E.inExpo);
@@ -197,7 +111,7 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
       R.bf.style.clipPath = `inset(0 ${((1 - fp) * 100).toFixed(2)}% 0 0)`;
       rise(R.ican, P(t, 4.22, .7, E.outExpo));
       T(R.bw, { s: lerp(1, 1.06, P(t, 4, 2, E.lin)) });
-      txt(R.tag, scr('WEBSITES · WEB APPS · STORES · DASHBOARDS · ANYTHING', P(TQ, 4.55, .7), 5));
+      txt(R.tag, scr('WEBSITES · WEB APPS · STORES · DASHBOARDS · ANYTHING', P(RS.TQ, 4.55, .7), 5));
     }
   });
 }
@@ -249,7 +163,7 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     let cur = 0; for (let i = 0; i < W.length - 1; i++) if (t >= W[i][1]) cur = i;
     W.slice(0, -1).forEach(([id], i) => show(R[id].el, i === cur));
     const [id, t0] = W[cur], lt = t - t0, C = R[id];
-    if (C.num) txt(C.num, scr(C.numT, P(TQ - t0, 0, .22), cur + 3));
+    if (C.num) txt(C.num, scr(C.numT, P(RS.TQ - t0, 0, .22), cur + 3));
     switch (id) {
       case 'c1': {
         const p = P(lt, 0, .42, E.outExpo);
@@ -285,8 +199,8 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
         C.ws.forEach((w, i) => rise(w, P(lt, i * .06, .42, E.outExpo)));
         const p = P(lt, 0, .4, E.outExpo);
         T(C.prod, { x: (1 - p) * 560, r: (1 - p) * 9, o: P(lt, 0, .06) });
-        txt(C.pr, '₹' + Math.round(2499 * P(TQ - t0, .05, .28, E.outCubic)).toLocaleString('en-IN'));
-        const added = TQ - t0 > .3;
+        txt(C.pr, '₹' + Math.round(2499 * P(RS.TQ - t0, .05, .28, E.outCubic)).toLocaleString('en-IN'));
+        const added = RS.TQ - t0 > .3;
         T(C.add, { s: 1 - .07 * bump(lt, .26, .1) });
         C.add.style.background = added ? 'var(--accent)' : 'var(--ink)'; C.add.style.color = added ? 'var(--ink)' : 'var(--bone)';
         txt(C.add, added ? 'Added to cart ✓' : 'Add to cart');
@@ -369,7 +283,7 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     // ── artboard + label
     const ao = P(t, 10.02, .3);
     R.border.style.opacity = ao * (1 - P(t, 13.85, .25));
-    html(R.label, TQ < 10.1 ? '' : `${scr('yourbrand.com', P(TQ, 10.1, .4), 2)} — <b>Desktop</b> · 1344 × 720`);
+    html(R.label, RS.TQ < 10.1 ? '' : `${scr('yourbrand.com', P(RS.TQ, 10.1, .4), 2)} — <b>Desktop</b> · 1344 × 720`);
     R.label.style.opacity = 1 - P(t, 13.75, .15);
     R.dims.forEach(d => d.style.opacity = P(t, 10.35, .25) * (1 - P(t, 10.95, .25)));
     // ── grid
@@ -401,7 +315,7 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     // ── toolbar / publish
     const tp = P(t, 13.85, .3, E.outExpo);
     T(R.tb, { y: (1 - tp) * -14, o: tp });
-    const live = TQ >= 14.86;
+    const live = RS.TQ >= 14.86;
     R.dots.forEach((d, i) => d.style.background = live ? ['#ff5f57', '#febc2e', '#28c840'][i] : '#3a3a3a');
     txt(R.ut, live ? 'https://yourbrand.com' : 'yourbrand.com');
     R.url.style.color = live ? 'var(--bone)' : 'var(--grey-2)';
@@ -410,7 +324,7 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     R.pr.style.width = (live ? 0 : P(t, 14.36, .5, E.inOutCubic) * 100) + '%';
     R.pub.style.background = live ? '#1f3b29' : 'var(--accent)';
     R.pub.style.color = live ? 'var(--live)' : 'var(--ink)';
-    html(R.lb, live ? '<i class="ld"></i>Live' : TQ >= 14.36 ? 'Publishing…' : 'Publish');
+    html(R.lb, live ? '<i class="ld"></i>Live' : RS.TQ >= 14.36 ? 'Publishing…' : 'Publish');
     // ── steps
     const ST = [10.1, 11.0, 12.5, 14.2, 14.95];
     R.stepsWrap.style.opacity = P(t, 10.1, .3) * (1 - P(t, 15.0, .25));
@@ -464,7 +378,7 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     const mp = P(t, 16.48, .6, E.inOutExpo), fs = .5;
     const x0 = 960 - R.hw / 2 - 120, y0 = 540 - R.hh / 2 - 150, zs = lerp(1, 1.04, P(t, 16, .48));
     T(R.head, { x: lerp(x0, 0, mp), y: lerp(y0, 0, mp), s: lerp(zs, fs, mp) });
-    txt(R.kick, scr(R.kickT, P(TQ, 16.02, .45), 21));
+    txt(R.kick, scr(R.kickT, P(RS.TQ, 16.02, .45), 21));
     R.nm.forEach((w, i) => rise(w, P(t, 15.95 + i * .08, .7, E.outExpo)));
     T(R.big, { x: (1 - P(t, 16.0, 1.2, E.outExpo)) * 300 - (t - 16) * 14, o: P(t, 16, .3) });
     R.glow.style.opacity = P(t, 16.5, .8);
@@ -472,7 +386,7 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     const ex = P(t, 19.42, .3, E.inCubic);
     T(R.desc, { y: (1 - P(t, 16.95, .6, E.outExpo)) * 40, o: P(t, 16.95, .3) });
     R.tags.forEach((g, i) => T(g, { s: P(t, 17.12 + i * .07, .4, E.outBackS), o: P(t, 17.12 + i * .07, .08) }));
-    txt(R.url.firstChild, scr('fiftyvillagers.org ', P(TQ, 17.4, .5), 9));
+    txt(R.url.firstChild, scr('fiftyvillagers.org ', P(RS.TQ, 17.4, .5), 9));
     T(R.left, { x: -ex * 140, o: 1 - ex });
     R.head.style.opacity = 1 - ex;
     // browser 3D fly-in
@@ -481,7 +395,7 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     // dashboard life
     R.st.forEach((s, i) => T(s, { y: (1 - P(t, 17.05 + i * .05, .5, E.outExpo)) * 24, o: P(t, 17.05 + i * .05, .15) }));
     R.vs.forEach((v, i) => {
-      const p = P(TQ, 17.12 + i * .06, .85, E.outCubic);
+      const p = P(RS.TQ, 17.12 + i * .06, .85, E.outCubic);
       if (v.dataset.r) txt(v, '₹' + (parseFloat(v.dataset.r) * p).toFixed(1) + 'L');
       else txt(v, Math.round(+v.dataset.n * p).toLocaleString('en-IN'));
     });
@@ -490,7 +404,7 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     R.area.style.opacity = P(t, 17.55, .6);
     const pt = R.line.getPointAtLength(R.len * lp); R.pt.setAttribute('cx', pt.x); R.pt.setAttribute('cy', pt.y); R.pt.style.opacity = lp > 0 ? 1 : 0;
     R.rows.forEach((r, i) => T(r, { x: (1 - P(t, 17.5 + i * .08, .5, E.outExpo)) * 40, o: P(t, 17.5 + i * .08, .15) }));
-    const paid = TQ >= 18.78;
+    const paid = RS.TQ >= 18.78;
     R.sw1.className = 'pl sw1 ' + (paid ? 'ok' : 'pd'); txt(R.sw1, paid ? 'Paid' : 'Pending');
     T(R.sw1, { s: 1 + .25 * bump(t, 18.78, .18) });
     const hp = P(t, 18.52, .32, E.inOutExpo);
@@ -545,14 +459,14 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     // title
     const hx0 = 960 - R.hw / 2, hy0 = 380 - R.hh / 2, hs = .48;
     T(R.head, { x: lerp(hx0, 120, pb), y: lerp(hy0, 96, pb), s: lerp(lerp(1, 1.03, P(t, 19.8, 1.2)), hs, pb) });
-    txt(R.kick, scr(R.kickT, P(TQ, 19.85, .45), 31));
+    txt(R.kick, scr(R.kickT, P(RS.TQ, 19.85, .45), 31));
     const hp = P(t, 19.9, .75, E.inOutCubic);
     R.hi.style.clipPath = `inset(-20% ${((1 - hp) * 100).toFixed(2)}% -20% 0)`;
     T(R.hi, { y: (1 - P(t, 19.9, .9, E.outExpo)) * 30, b: (1 - hp) * 8 });
     T(R.en, { y: (1 - P(t, 20.35, .6, E.outExpo)) * 30, o: P(t, 20.35, .25) });
     // left column
     R.stt.forEach((s, i) => T(s, { y: (1 - P(t, 21.35 + i * .08, .6, E.outExpo)) * 40, o: P(t, 21.35 + i * .08, .2) }));
-    txt(R.c300, String(Math.round(300 * P(TQ, 21.4, .95, E.outCubic))));
+    txt(R.c300, String(Math.round(300 * P(RS.TQ, 21.4, .95, E.outCubic))));
     R.chips.forEach((c, i) => T(c, { s: P(t, 22.0 + i * .1, .45, E.outBackS), o: P(t, 22.0 + i * .1, .08) }));
     T(R.quote, { y: (1 - P(t, 22.62, .6, E.outExpo)) * 30, o: P(t, 22.62, .25) });
     // devices
@@ -579,15 +493,15 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
       box.appendChild(d); return { d, pc: $('.pc', d), disk: $('.disk', d), n: $('.n', d), l: $('.l', d) };
     });
   }, t => {
-    txt(R.kick, scr(R.kickT, P(TQ, 24.05, .45), 41));
+    txt(R.kick, scr(R.kickT, P(RS.TQ, 24.05, .45), 41));
     R.h.forEach((w, i) => rise(w, P(t, 24.02 + i * .07, .7, E.outExpo)));
     R.rg.forEach((g, i) => {
       const s0 = 24.12 + i * .06, c = P(t, s0 + .08, .85, E.outCubic), done = s0 + .08 + .85;
       T(g.d, { s: P(t, s0, .5, E.outBackS) * (1 + .1 * bump(t, done, .22)) });
       g.pc.style.strokeDashoffset = CIRC * (1 - c);
-      txt(g.n, String(Math.round(100 * P(TQ, s0 + .08, .85, E.outCubic))));
+      txt(g.n, String(Math.round(100 * P(RS.TQ, s0 + .08, .85, E.outCubic))));
       const dk = P(t, done, .28, E.outBackS);
-      T(g.disk, { s: dk }); g.n.style.color = P(TQ, done, .28, E.outBackS) > .45 ? 'var(--accent)' : 'var(--ink)';
+      T(g.disk, { s: dk }); g.n.style.color = P(RS.TQ, done, .28, E.outBackS) > .45 ? 'var(--accent)' : 'var(--ink)';
       g.l.style.opacity = P(t, s0 + .2, .3);
     });
     R.sub.forEach((w, i) => rise(w, P(t, 25.2 + i * .09, .6, E.outExpo)));
@@ -609,7 +523,7 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     const pr = rel(R.pill, $('#stage')); R.px = pr.x + pr.w * .62; R.py = pr.y + pr.h * .55; R.rpx = pr.w * .62; R.rpy = pr.h * .55;
   }, t => {
     T(R.strip, { sy: P(t, 26.0, .55, E.outExpo) });
-    R.metas.forEach((m, i) => txt(m, scr(R.metaT[i], P(TQ, 26.2 + i * .1, .5), 51 + i)));
+    R.metas.forEach((m, i) => txt(m, scr(R.metaT[i], P(RS.TQ, 26.2 + i * .1, .5), 51 + i)));
     T(R.rule, { sx: P(t, 26.25, .7, E.outExpo) });
     [...R.n1, ...R.n2].forEach((c, i) => { const p = P(t, 25.97 + i * .045, 1.0, E.outExpo); rise(c, p, 140); });
     const beats = [26, 26.5, 27, 27.5, 28, 28.5, 29, 29.5];
@@ -619,7 +533,7 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     R.glow.style.opacity = P(t, 26, .7) * (.85 + .15 * pulse);
     R.rot.setAttribute('transform', `rotate(${((t - 26) * 16).toFixed(2)} 200 200)`);
     R.badge.style.opacity = P(t, 26.5, .6);
-    txt(R.role, scr('FULL-STACK DEVELOPER  ·  WEB  ·  APPS  ·  ANYTHING', P(TQ, 26.62, .7), 61));
+    txt(R.role, scr('FULL-STACK DEVELOPER  ·  WEB  ·  APPS  ·  ANYTHING', P(RS.TQ, 26.62, .7), 61));
     const pp = P(t, 27.2, .55, E.outBackS), hov = P(t, 28.28, .2, E.outCubic);
     T(R.pill, { s: lerp(.6, 1, pp) * (1 + .045 * hov), o: P(t, 27.2, .1) });
     R.pill.style.boxShadow = `0 ${(18 * hov).toFixed(1)}px ${(50 * hov).toFixed(1)}px rgba(255,77,28,${(.5 * hov).toFixed(2)})`;
@@ -627,8 +541,8 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
     const rp = P(t, 28.56, .6, E.outCubic);
     Object.assign(R.rp.style, { left: R.rpx + 'px', top: R.rpy + 'px' });
     T(R.rp, { s: rp * 16, o: t < 28.56 ? 0 : (1 - rp) * .9 });
-    txt(R.c1, scr('avanishjha.dev', P(TQ, 27.42, .5), 71));
-    txt(R.c2, scr('avanishjha2011@gmail.com', P(TQ, 27.6, .6), 72));
+    txt(R.c1, scr('avanishjha.dev', P(RS.TQ, 27.42, .5), 71));
+    txt(R.c2, scr('avanishjha2011@gmail.com', P(RS.TQ, 27.6, .6), 72));
     R.c2.style.color = 'var(--grey-2)';
     const cx = K(t, [[27.95, 900], [28.36, R.px, E.outCubic], [28.9, R.px], [29.5, R.px + 260, E.inOutCubic]]);
     const cy = K(t, [[27.95, 1120], [28.36, R.py, E.outCubic], [28.9, R.py], [29.5, R.py + 240, E.inOutCubic]]);
@@ -636,91 +550,5 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
   });
 }
 
-/* ═══════════════════════════ GLOBAL FX ═══════════════════════════ */
-const FX = {};
-const SECTIONS = [[0, '[00] — Boot'], [1.95, '[01] — The promise'], [6, '[02] — What I build'], [10, '[03] — Process'], [16, '[04] — Work / Fifty Villagers'], [19.75, '[05] — Work / Kalam Ashram'], [24, '[06] — The standard'], [26, '[07] — Let’s talk']];
-const HUDC = [[0, 'b'], [1.99, 'i'], [4, 'b'], [5.9, 'i'], [6.5, 'b'], [7, 'i'], [8, 'b'], [8.5, 'i'], [9.1667, 'b'], [9.3333, 'i'], [9.5, 'b'], [9.97, 'i'], [10.18, 'b'], [23.99, 'i'], [26, 'b']];
-const SHAKE = [[2.0, 5], [4.0, 24], [6.0, 6], [7.0, 4], [9.0, 5], [9.5, 8], [10.0, 10], [14.86, 5], [16.0, 14], [20.0, 5], [24.0, 8], [26.0, 20]];
-const FLASH = [[4.0, .28, '#ff4d1c'], [10.0, .16, '#efece4'], [16.0, .1, '#efece4'], [26.0, .12, '#efece4']];
-const WIPES = [{ t: 5.54, c: ['#ff4d1c', '#0a0a0a', '#efece4'] }, { t: 23.54, c: ['#efece4', '#0a0a0a', '#ff4d1c'] }];
-function buildFX() {
-  FX.world = $('#world'); FX.flash = $('#fx-flash'); FX.grain = $('#fx-grain'); FX.cover = $('#cover'); FX.wipe = $('#wipe'); FX.panels = $$('#wipe>div');
-  FX.hud = $('#hud'); FX.tr = $('#hud .tr'); FX.bl = $('#hud .bl'); FX.hs = $$('#hud .h');
-  // film grain tile
-  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d'), im = g.createImageData(256, 256), r = rng(99);
-  for (let i = 0; i < im.data.length; i += 4) { const v = 128 + (r() - .5) * 150; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
-  g.putImageData(im, 0, 0); FX.grain.style.backgroundImage = `url(${c.toDataURL()})`;
-}
-function renderFX(t) {
-  // camera shake
-  let sx = 0, sy = 0, sr = 0;
-  SHAKE.forEach(([ti, a], i) => { const d = decay(t, ti, 9) * a; if (d > .01) { sx += d * (Math.sin(t * 91 + i) * .6 + Math.sin(t * 143 + i * 3) * .4); sy += d * (Math.sin(t * 107 + i * 2) * .6 + Math.sin(t * 61 + i) * .4); sr += d * .02 * Math.sin(t * 77 + i); } });
-  FX.world.style.transform = Math.abs(sx) + Math.abs(sy) > .05 ? `translate(${sx.toFixed(2)}px,${sy.toFixed(2)}px) rotate(${sr.toFixed(3)}deg) scale(${(1 + (Math.abs(sx) + Math.abs(sy)) * .0006).toFixed(4)})` : 'none';
-  // flash
-  let fo = 0, fc = '#efece4'; FLASH.forEach(([ti, a, c]) => { const d = decay(t, ti, 16) * a; if (d > fo) { fo = d; fc = c; } });
-  FX.flash.style.opacity = fo.toFixed(3); FX.flash.style.background = fc;
-  // grain
-  const gf = Math.floor(FR / 2); // 30 Hz grain
-  FX.grain.style.backgroundPosition = `${Math.floor(hash(gf, 1) * 256)}px ${Math.floor(hash(gf, 2) * 256)}px`;
-  // accent cover (Anything. → Process)
-  const cv = t >= 9.97 && t < 10.4; show(FX.cover, cv);
-  if (cv) T(FX.cover, { y: -P(t, 10.0, .36, E.inOutQuart) * 1090 });
-  // shape wipes
-  let w = null; WIPES.forEach(x => { if (t >= x.t && t < x.t + 1.0) w = x; });
-  show(FX.wipe, !!w);
-  if (w) FX.panels.forEach((p, i) => { p.style.background = w.c[i]; const pin = P(t, w.t + i * .06, .3, E.inOutQuart), pout = P(t, w.t + .46, .26, E.outQuart); p.style.transform = `translateY(${((1 - pin) * 101 - pout * 101).toFixed(2)}%)`; });
-  // HUD
-  let hc = 'b'; HUDC.forEach(([ti, c]) => { if (t >= ti) hc = c; });
-  FX.hud.style.color = hc === 'b' ? 'var(--bone)' : 'var(--ink)';
-  const f = FR, ss = Math.floor(f / FPS), ff = f % FPS, pad = n => String(n).padStart(2, '0');
-  txt(FX.tr, `TC 00:00:${pad(ss)}:${pad(ff)}`);
-  let si = 0; SECTIONS.forEach(([ti], i) => { if (t >= ti) si = i; });
-  txt(FX.bl, scr(SECTIONS[si][1], P(TQ, SECTIONS[si][0] + .05, .4), 90 + si));
-  const ho = P(t, .15, .4) * (1 - P(t, 25.85, .2));
-  FX.hs.forEach(h => h.style.opacity = ho.toFixed(3));
-  FX.hud.querySelectorAll('.cm').forEach(c => c.style.opacity = (P(t, .1, .3) * .65).toFixed(3));
-}
-
-/* ═══════════════════════════ PLAYER ═══════════════════════════ */
-function seek(t, fr) {
-  t = cl(t, 0, DUR - 1e-6);
-  FR = fr ?? Math.floor(t * FPS + 1e-6);
-  TQ = fr === undefined ? t : fr / FPS;
-  for (const s of scenes) {
-    const on = t >= s.a && t < s.b;
-    if (s.on !== on) { s.el.style.display = on ? 'block' : 'none'; s.on = on; }
-    if (on) s.render(t);
-  }
-  renderFX(t);
-}
-function fit() {
-  const vw = innerWidth, vh = innerHeight, k = Math.min(vw / 1920, vh / 1080);
-  STAGE_SCALE = k;
-  const st = $('#stage');
-  st.style.transform = `translate(${(vw - 1920 * k) / 2}px,${(vh - 1080 * k) / 2}px) scale(${k})`;
-}
-async function init() {
-  await document.fonts.ready;
-  await Promise.all(['400 20px Inter', '600 20px Inter', '700 20px Inter', '800 20px Inter', '900 20px Inter', 'italic 400 20px "Instrument Serif"', '400 20px "Instrument Serif"', '400 20px "JetBrains Mono"', '400 20px "Tiro Devanagari Hindi"']
-    .map(f => document.fonts.load(f, f.includes('Tiro') ? 'कलाम आश्रम' : 'Aa₹')));
-  STAGE_SCALE = 1; $('#stage').style.transform = 'none';
-  // build every scene while visible so measurements are real
-  for (const s of scenes) { s.el.style.visibility = 'visible'; s.build(); s.el.style.display = 'none'; s.on = false; }
-  buildFX();
-  const q = new URLSearchParams(location.search);
-  if (q.has('render')) { seek(+q.get('t') || 0); window.__ready = true; return; }
-  fit(); addEventListener('resize', fit);
-  // real-time preview (click to play with sound)
-  const audio = new Audio('../assets/showreel-audio.m4a'); let start = null, off = +q.get('t') || 0;
-  seek(off);
-  const loop = now => { if (start !== null) { const t = off + (now - start) / 1000; if (t >= DUR) { start = null; off = 0; } else seek(t); } requestAnimationFrame(loop); };
-  requestAnimationFrame(loop);
-  const hint = document.createElement('div');
-  hint.textContent = '▶  Play — with sound';
-  hint.style.cssText = 'position:fixed;left:50%;bottom:6vh;transform:translateX(-50%);padding:14px 26px;border-radius:30px;background:#ff4d1c;color:#0a0a0a;font:600 15px Inter,sans-serif;letter-spacing:.02em;cursor:pointer;z-index:9;box-shadow:0 10px 40px rgba(255,77,28,.4)';
-  document.body.appendChild(hint);
-  addEventListener('click', () => { hint.remove(); if (start === null) { off = off >= DUR - .05 ? 0 : off; audio.currentTime = off; audio.play().catch(() => {}); start = performance.now(); } else { audio.pause(); off += (performance.now() - start) / 1000; start = null; } });
-}
-window.__seek = seek;
-init();
+Reel.start({ W: 1920, H: 1080 });
 })();

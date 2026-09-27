@@ -2,8 +2,9 @@
 // captures it with headless Chromium. Frames are written as PNGs, then
 // encoded by encode.sh.
 //
-//   node render.mjs frames <outDir> [--fps 60] [--sub 2] [--workers 4] [--from 0] [--to 30]
+//   node render.mjs frames <outDir> [--fps 60] [--sub 4] [--workers 4] [--from 0] [--to 30] [--jpg]
 //   node render.mjs stills <outDir> 0.5 4.2 12.8 ...
+//   add --page vertical.html --size 1080x1920 for the 9:16 cut
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -30,15 +31,17 @@ function serve() {
 
 const args = process.argv.slice(2);
 const mode = args[0], out = args[1];
-const opt = (k, d) => { const i = args.indexOf('--' + k); return i > 0 ? +args[i + 1] : d; };
+const optS = (k, d) => { const i = args.indexOf('--' + k); return i > 0 ? args[i + 1] : d; };
+const opt = (k, d) => +optS(k, d);
+const PAGE = optS('page', 'index.html'), [VW, VH] = optS('size', '1920x1080').split('x').map(Number);
 fs.mkdirSync(out, { recursive: true });
 
 const srv = await serve();
-const url = `http://127.0.0.1:${srv.address().port}/src/index.html?render=1`;
+const url = `http://127.0.0.1:${srv.address().port}/src/${PAGE}?render=1`;
 const browser = await chromium.launch({ args: ['--font-render-hinting=none', '--disable-lcd-text', '--force-color-profile=srgb', '--hide-scrollbars'] });
 
 async function page() {
-  const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+  const ctx = await browser.newContext({ viewport: { width: VW, height: VH }, deviceScaleFactor: 1 });
   const pg = await ctx.newPage();
   pg.on('pageerror', e => console.error('pageerror:', e.message));
   pg.on('console', m => { if (m.type() === 'error') console.error('console:', m.text()); });
@@ -57,7 +60,9 @@ async function shot({ pg, cdp }, t, file, fr) {
 const t0 = Date.now();
 if (mode === 'stills') {
   const p = await page();
-  for (const ts of args.slice(2)) { await shot(p, +ts, path.join(out, `still_${(+ts).toFixed(3)}.png`)); }
+  // numeric args that aren't the value of a --flag
+  const times = args.slice(2).filter((a, i, all) => /^[\d.]+$/.test(a) && !(all[i - 1] || '').startsWith('--'));
+  for (const ts of times) { await shot(p, +ts, path.join(out, `still_${(+ts).toFixed(3)}.png`)); }
 } else {
   const fps = opt('fps', 60), sub = opt('sub', 1), workers = opt('workers', 4), from = opt('from', 0), to = opt('to', 30);
   // motion blur: `sub` samples across a 180° shutter that opens on the frame,

@@ -1,0 +1,116 @@
+/* ═══════════════════════════════════════════════════════════════════
+   AVANISH JHA — SHOWREEL 2026 · 9:16 (1080×1920) layout
+   Loaded after reel.css: components are shared, only layout changes.
+   Key content stays inside the Reels/Status safe area (~y 250–1650).
+   ═══════════════════════════════════════════════════════════════════ */
+.v #stage{width:1080px;height:1920px}
+
+/* S1 · ignition */
+.v #s1 .half{height:960px}
+.v #s1 .half.bot{top:960px}
+.v #s1 .half.bot .gridbg,.v #s1 .half.bot .dotbg{top:-960px;height:1920px}
+.v #s1 .core{transform-origin:540px 960px}
+.v #s1 .dot{left:540px;top:960px}
+.v #s1 .type{top:1030px;font-size:34px}
+.v #s1 .sub{top:1096px;letter-spacing:.3em}
+
+/* S2 · promise */
+.v #s2 .s2a .kick{left:100px;top:400px}
+.v #s2 .l{left:88px;font-size:250px}
+.v #s2 .l1{top:450px}.v #s2 .l2{top:690px}.v #s2 .l3{top:930px}.v #s2 .l4{top:1170px}
+.v #s2 .badge{left:720px;top:1470px}
+.v #s2 .bwrap{top:660px;height:560px;transform-origin:540px 280px}
+.v #s2 .ican{top:-120px;font-size:136px}
+.v #s2 .build{left:66px;right:auto;top:30px;text-align:left;font-size:282px;line-height:.9}
+.v #s2 .s2b .tag{top:1330px;font-size:21px;letter-spacing:.34em;line-height:2;white-space:pre}
+
+/* S3 · capabilities */
+.v #s3 .cnum{left:84px;top:230px}
+.v #c1 .word{top:850px;font-size:218px}
+.v #c2 .word{top:690px;font-size:300px;line-height:.95}
+.v #c3 .word{top:360px;font-size:290px;line-height:.92}
+.v #c4 .word{left:88px;top:290px;font-size:250px}
+.v #c4 .prod{left:300px;top:860px}
+.v #c5 .word{top:700px;font-size:222px;line-height:.98}
+.v #c5 .col{width:150px}
+.v #c6 .word{left:88px;top:270px;font-size:260px}
+.v #c6 .ph{left:350px;top:900px;width:380px;height:760px}
+.v #c7 .word{font-size:410px}
+.v #c8 .word{font-size:255px}
+.v #c9 .word{font-size:222px}
+.v #c10 .word{top:820px;font-size:232px}
+.v #c10 .and{top:1150px;font-size:20px;letter-spacing:.26em}
+
+/* S4 · process — a portrait "tablet" artboard */
+.v #s4 .artlabel{left:90px;top:292px}
+.v #s4 .toolbar{left:90px;top:276px;width:900px}
+.v #s4 .toolbar .url{min-width:300px}
+.v #s4 .toolbar .pub{margin-left:auto}
+.v #s4 .board{left:90px;top:330px;width:900px;height:1240px}
+.v #s4 .insp{left:760px;top:420px;width:280px}
+.v #s4 .steps{left:90px;top:1640px;width:900px;gap:16px}
+.v #s4 .steps>div{font-size:13px;letter-spacing:.14em}
+.v #s4 .phone{left:596px;top:576px;width:360px;height:720px;transform-origin:0 0}
+.v #s4 .devlabel{top:1290px}
+.v #s4 .devlabel .t{font-size:74px;line-height:1.06}
+.v .pg .links{gap:28px}
+.v .pg .cta{margin-left:34px}
+.v .pg h1{top:160px;font-size:102px}
+.v .pg .sub{top:490px;width:560px}
+.v .pg .btns{top:580px}
+.v .pg .art{left:48px;top:680px;width:804px;height:380px}
+.v .pg .art .sun,.v .pg .art .rg{left:402px;top:210px}
+.v .pg .cards{top:1090px}
+
+/* S5 · Fifty Villagers */
+.v #s5 .glow{left:-60px;top:640px;width:1200px;height:1200px}
+.v #s5 .bignum{right:-30px;top:40px;font-size:560px}
+.v #s5 .head{left:80px;top:170px}
+.v #s5 .head .nm{font-size:232px;line-height:.95}
+.v #s5 .left{left:84px;top:480px;width:900px}
+.v #s5 .desc{font-size:34px}
+.v #s5 .tags{margin-top:26px}
+.v #s5 .url{margin-top:24px}
+.v #s5 .p3d{perspective-origin:540px 1210px}
+.v #s5 .fvb{left:90px;top:820px;width:900px;height:780px}
+.v .db .side{width:176px;padding:20px 12px}
+.v .db .side .hl{left:12px;right:12px}
+.v .db .main{padding:18px 22px}
+.v .db .srch{width:150px}
+.v .db .stats{gap:10px;margin-top:16px}
+.v .db .st{height:100px;padding:14px}
+.v .db .st .v{font-size:32px}
+.v .db .row{grid-template-columns:1fr;gap:12px;margin-top:12px}
+.v .db .pn{height:auto}
+.v .db .pn:first-child{height:224px}
+.v .db .pn svg.ch{height:164px}
+.v .db .tr{padding:9px 0}
+
+/* S6 · Kalam Ashram */
+.v #s6 .sun{left:540px;top:1420px}
+.v #s6 .dunes{width:1080px;height:1920px}
+.v #s6 .head .hi{font-size:192px}
+.v #s6 .head .en{font-size:54px}
+.v #s6 .left{left:0;top:0;width:1080px;height:1920px}
+.v #s6 .stt{position:absolute;left:84px;top:430px;gap:40px}
+.v #s6 .stt .n{font-size:112px}
+.v #s6 .chips{position:absolute;left:84px;top:1330px;width:540px;margin:0}
+.v #s6 .quote{position:absolute;left:84px;top:1480px;width:560px;margin:0;font-size:32px}
+.v #s6 .kab{left:90px;top:680px;width:900px;height:580px}
+.v #s6 .kap{left:700px;top:1010px;width:290px;height:600px}
+.v .ka .lk{gap:24px}
+
+/* S7 · the standard */
+.v #s7 .kick{top:240px}
+.v #s7 .h{top:290px;font-size:196px}
+.v #s7 .sub{top:1660px;font-size:26px}
+.v #s7 .sub .dt{margin:0 14px}
+
+/* S8 · outro */
+.v #s8 .glow,.v #s8 .rgs{left:540px;top:1640px}
+.v #s8 .fade{background:radial-gradient(ellipse 85% 55% at 50% 82%,rgba(26,18,9,0),rgba(10,10,10,.72))}
+.v #s8 .meta{top:286px;font-size:18px}
+.v #s8 .rule{left:84px;top:332px;width:912px}
+.v #s8 .name{left:68px;top:372px;font-size:252px}
+.v #s8 .role{left:88px;top:874px;font-size:22px;line-height:1.8}
+.v #s8 .cta{left:84px;top:990px;flex-direction:column;align-items:flex-start;gap:30px}

@@ -50,6 +50,14 @@ video{display:block;width:100%;height:auto;aspect-ratio:16/9}
 .cell a{border-bottom:1px dashed rgba(239,236,228,.35)}
 .cell a:hover{color:var(--accent);border-color:var(--accent)}
 footer{margin-top:48px;font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--grey);display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+.vert{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:clamp(24px,5vw,64px);align-items:center;margin-top:clamp(48px,7vw,88px);padding-top:clamp(32px,5vw,56px);border-top:1px solid rgba(239,236,228,.1)}
+.vert h2{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(36px,5vw,64px);line-height:.95;letter-spacing:-.02em}
+.vert h2 em{color:var(--accent)}
+.vert p{margin-top:16px;font-size:16px;line-height:1.55;color:rgba(239,236,228,.78);max-width:460px}
+.vert .k{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.vert .player{max-width:340px;width:100%;justify-self:center}
+.vert video{aspect-ratio:9/16}
+@media (max-width:760px){.vert{grid-template-columns:1fr}}
 @media (max-width:560px){.btn{width:100%;justify-content:center}}
 </style>
 </head>
@@ -67,6 +75,22 @@ footer{margin-top:48px;font-family:var(--mono);font-size:12px;letter-spacing:.14
     <a class="btn" href="avanish-jha-showreel-2026.mp4" download>Download <small>1080p · 60fps</small></a>
     <a class="btn" href="avanish-jha-showreel-2026-720p.mp4" download>For WhatsApp <small>720p · small</small></a>
   </div>
+  <section class="vert">
+    <div>
+      <div class="k">Vertical cut · 9:16</div>
+      <h2>Made for <em>Reels</em> and Status.</h2>
+      <p>The same 30 seconds, re-composed shot by shot for phones — ready for Instagram Reels, YouTube Shorts and WhatsApp Status.</p>
+      <div class="row">
+        <a class="btn" href="avanish-jha-showreel-2026-vertical.mp4" download>Reels / Shorts <small>1080×1920</small></a>
+        <a class="btn" href="avanish-jha-showreel-2026-vertical-720p.mp4" download>WhatsApp Status <small>small</small></a>
+      </div>
+    </div>
+    <div class="player">
+      <video controls playsinline preload="metadata" poster="assets/poster-vertical.jpg">
+        <source src="avanish-jha-showreel-2026-vertical.mp4" type="video/mp4">
+      </video>
+    </div>
+  </section>
   <div class="grid">
     <div class="cell"><div class="k">What I build</div><p>Websites, web apps, online stores, dashboards and landing pages — designed with care, fast on every phone, and found on Google.</p></div>
     <div class="cell"><div class="k">Selected work</div><p><a href="https://fiftyvillagers.org" target="_blank" rel="noopener">Fifty Villagers</a> — enrolments, fees &amp; dashboards on one secure platform.<br><a href="https://kalamashram.org" target="_blank" rel="noopener">Kalam Ashram</a> — residential education &amp; exam preparation, Barmer.</p></div>
