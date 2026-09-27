@@ -97,44 +97,63 @@ const scene = (id, a, b, build, render) => scenes.push({ el: $('#' + id), a, b, 
 
 /* ═══════════════════════════ GLOBAL FX ═══════════════════════════ */
 const FX = {};
-const SECTIONS = [[0, '[00] — Boot'], [1.95, '[01] — The promise'], [6, '[02] — What I build'], [10, '[03] — Process'], [16, '[04] — Work / Fifty Villagers'], [19.75, '[05] — Work / Kalam Ashram'], [24, '[06] — The standard'], [26, '[07] — Let’s talk']];
-const HUDC = [[0, 'b'], [1.99, 'i'], [4, 'b'], [5.9, 'i'], [6.5, 'b'], [7, 'i'], [8, 'b'], [8.5, 'i'], [9.1667, 'b'], [9.3333, 'i'], [9.5, 'b'], [9.97, 'i'], [10.18, 'b'], [23.99, 'i'], [26, 'b']];
-const SHAKE = [[2.0, 5], [4.0, 24], [6.0, 6], [7.0, 4], [9.0, 5], [9.5, 8], [10.0, 10], [14.86, 5], [16.0, 14], [20.0, 5], [24.0, 8], [26.0, 20]];
-const FLASH = [[4.0, .28, '#ff4d1c'], [10.0, .16, '#efece4'], [16.0, .1, '#efece4'], [26.0, .12, '#efece4']];
-const WIPES = [{ t: 5.54, c: ['#ff4d1c', '#0a0a0a', '#efece4'] }, { t: 23.54, c: ['#efece4', '#0a0a0a', '#ff4d1c'] }];
+// Timing for the built-in effects. Defaults are Vol. 01's; another reel
+// passes its own via Reel.start({ fx }). `hud: false` hands the HUD to the
+// reel itself (it can render one as an always-on scene).
+const FXC = {
+  sections: [[0, '[00] — Boot'], [1.95, '[01] — The promise'], [6, '[02] — What I build'], [10, '[03] — Process'], [16, '[04] — Work / Fifty Villagers'], [19.75, '[05] — Work / Kalam Ashram'], [24, '[06] — The standard'], [26, '[07] — Let’s talk']],
+  hudColors: [[0, 'b'], [1.99, 'i'], [4, 'b'], [5.9, 'i'], [6.5, 'b'], [7, 'i'], [8, 'b'], [8.5, 'i'], [9.1667, 'b'], [9.3333, 'i'], [9.5, 'b'], [9.97, 'i'], [10.18, 'b'], [23.99, 'i'], [26, 'b']],
+  shake: [[2.0, 5], [4.0, 24], [6.0, 6], [7.0, 4], [9.0, 5], [9.5, 8], [10.0, 10], [14.86, 5], [16.0, 14], [20.0, 5], [24.0, 8], [26.0, 20]],
+  flash: [[4.0, .28, '#ff4d1c'], [10.0, .16, '#efece4'], [16.0, .1, '#efece4'], [26.0, .12, '#efece4']],
+  wipes: [{ t: 5.54, c: ['#ff4d1c', '#0a0a0a', '#efece4'] }, { t: 23.54, c: ['#efece4', '#0a0a0a', '#ff4d1c'] }],
+  cover: { from: 9.97, to: 10.4, start: 10.0 },
+  hud: true,
+};
 function buildFX() {
   FX.world = $('#world'); FX.flash = $('#fx-flash'); FX.grain = $('#fx-grain'); FX.cover = $('#cover'); FX.wipe = $('#wipe'); FX.panels = $$('#wipe>div');
-  FX.hud = $('#hud'); FX.tr = $('#hud .tr'); FX.bl = $('#hud .bl'); FX.hs = $$('#hud .h');
+  FX.hud = FXC.hud && $('#hud');
+  if (FX.hud) { FX.tr = $('#hud .tr'); FX.bl = $('#hud .bl'); FX.hs = $$('#hud .h'); }
   // film grain tile
-  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d'), im = g.createImageData(256, 256), r = rng(99);
-  for (let i = 0; i < im.data.length; i += 4) { const v = 128 + (r() - .5) * 150; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
-  g.putImageData(im, 0, 0); FX.grain.style.backgroundImage = `url(${c.toDataURL()})`;
+  if (FX.grain) {
+    const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d'), im = g.createImageData(256, 256), r = rng(99);
+    for (let i = 0; i < im.data.length; i += 4) { const v = 128 + (r() - .5) * 150; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
+    g.putImageData(im, 0, 0); FX.grain.style.backgroundImage = `url(${c.toDataURL()})`;
+  }
 }
 function renderFX(t) {
   // camera shake
   let sx = 0, sy = 0, sr = 0;
-  SHAKE.forEach(([ti, a], i) => { const d = decay(t, ti, 9) * a; if (d > .01) { sx += d * (Math.sin(t * 91 + i) * .6 + Math.sin(t * 143 + i * 3) * .4); sy += d * (Math.sin(t * 107 + i * 2) * .6 + Math.sin(t * 61 + i) * .4); sr += d * .02 * Math.sin(t * 77 + i); } });
+  FXC.shake.forEach(([ti, a], i) => { const d = decay(t, ti, 9) * a; if (d > .01) { sx += d * (Math.sin(t * 91 + i) * .6 + Math.sin(t * 143 + i * 3) * .4); sy += d * (Math.sin(t * 107 + i * 2) * .6 + Math.sin(t * 61 + i) * .4); sr += d * .02 * Math.sin(t * 77 + i); } });
   FX.world.style.transform = Math.abs(sx) + Math.abs(sy) > .05 ? `translate(${sx.toFixed(2)}px,${sy.toFixed(2)}px) rotate(${sr.toFixed(3)}deg) scale(${(1 + (Math.abs(sx) + Math.abs(sy)) * .0006).toFixed(4)})` : 'none';
   // flash
-  let fo = 0, fc = '#efece4'; FLASH.forEach(([ti, a, c]) => { const d = decay(t, ti, 16) * a; if (d > fo) { fo = d; fc = c; } });
-  FX.flash.style.opacity = fo.toFixed(3); FX.flash.style.background = fc;
+  if (FX.flash) {
+    let fo = 0, fc = '#efece4'; FXC.flash.forEach(([ti, a, c]) => { const d = decay(t, ti, 16) * a; if (d > fo) { fo = d; fc = c; } });
+    FX.flash.style.opacity = fo.toFixed(3); FX.flash.style.background = fc;
+  }
   // grain
-  const gf = Math.floor(RS.FR / 2); // 30 Hz grain
-  FX.grain.style.backgroundPosition = `${Math.floor(hash(gf, 1) * 256)}px ${Math.floor(hash(gf, 2) * 256)}px`;
-  // accent cover (Anything. → Process)
-  const cv = t >= 9.97 && t < 10.4; show(FX.cover, cv);
-  if (cv) T(FX.cover, { y: -P(t, 10.0, .36, E.inOutQuart) * (RS.H + 10) });
+  if (FX.grain) {
+    const gf = Math.floor(RS.FR / 2); // 30 Hz grain
+    FX.grain.style.backgroundPosition = `${Math.floor(hash(gf, 1) * 256)}px ${Math.floor(hash(gf, 2) * 256)}px`;
+  }
+  // full-frame cover (Vol. 01: "Anything." → Process)
+  if (FX.cover && FXC.cover) {
+    const cv = t >= FXC.cover.from && t < FXC.cover.to; show(FX.cover, cv);
+    if (cv) T(FX.cover, { y: -P(t, FXC.cover.start, .36, E.inOutQuart) * (RS.H + 10) });
+  }
   // shape wipes
-  let w = null; WIPES.forEach(x => { if (t >= x.t && t < x.t + 1.0) w = x; });
-  show(FX.wipe, !!w);
-  if (w) FX.panels.forEach((p, i) => { p.style.background = w.c[i]; const pin = P(t, w.t + i * .06, .3, E.inOutQuart), pout = P(t, w.t + .46, .26, E.outQuart); p.style.transform = `translateY(${((1 - pin) * 101 - pout * 101).toFixed(2)}%)`; });
+  if (FX.wipe) {
+    let w = null; FXC.wipes.forEach(x => { if (t >= x.t && t < x.t + 1.0) w = x; });
+    show(FX.wipe, !!w);
+    if (w) FX.panels.forEach((p, i) => { p.style.background = w.c[i]; const pin = P(t, w.t + i * .06, .3, E.inOutQuart), pout = P(t, w.t + .46, .26, E.outQuart); p.style.transform = `translateY(${((1 - pin) * 101 - pout * 101).toFixed(2)}%)`; });
+  }
   // HUD
-  let hc = 'b'; HUDC.forEach(([ti, c]) => { if (t >= ti) hc = c; });
+  if (!FX.hud) return;
+  let hc = 'b'; FXC.hudColors.forEach(([ti, c]) => { if (t >= ti) hc = c; });
   FX.hud.style.color = hc === 'b' ? 'var(--bone)' : 'var(--ink)';
   const f = RS.FR, ss = Math.floor(f / FPS), ff = f % FPS, pad = n => String(n).padStart(2, '0');
   txt(FX.tr, `TC 00:00:${pad(ss)}:${pad(ff)}`);
-  let si = 0; SECTIONS.forEach(([ti], i) => { if (t >= ti) si = i; });
-  txt(FX.bl, scr(SECTIONS[si][1], P(RS.TQ, SECTIONS[si][0] + .05, .4), 90 + si));
+  let si = 0; FXC.sections.forEach(([ti], i) => { if (t >= ti) si = i; });
+  txt(FX.bl, scr(FXC.sections[si][1], P(RS.TQ, FXC.sections[si][0] + .05, .4), 90 + si));
   const ho = P(t, .15, .4) * (1 - P(t, 25.85, .2));
   FX.hs.forEach(h => h.style.opacity = ho.toFixed(3));
   FX.hud.querySelectorAll('.cm').forEach(c => c.style.opacity = (P(t, .1, .3) * .65).toFixed(3));
@@ -158,11 +177,11 @@ function fit() {
   const st = $('#stage');
   st.style.transform = `translate(${(vw - RS.W * k) / 2}px,${(vh - RS.H * k) / 2}px) scale(${k})`;
 }
-async function start({ W, H }) {
-  RS.W = W; RS.H = H;
+const VOL1_FONTS = ['400 20px Inter', '600 20px Inter', '700 20px Inter', '800 20px Inter', '900 20px Inter', 'italic 400 20px "Instrument Serif"', '400 20px "Instrument Serif"', '400 20px "JetBrains Mono"', '400 20px "Tiro Devanagari Hindi"'];
+async function start({ W, H, fx = {}, fonts = VOL1_FONTS, deva = 'Tiro', audio = '../assets/showreel-audio.m4a', accent = '#ff4d1c' }) {
+  RS.W = W; RS.H = H; Object.assign(FXC, fx);
   await document.fonts.ready;
-  await Promise.all(['400 20px Inter', '600 20px Inter', '700 20px Inter', '800 20px Inter', '900 20px Inter', 'italic 400 20px "Instrument Serif"', '400 20px "Instrument Serif"', '400 20px "JetBrains Mono"', '400 20px "Tiro Devanagari Hindi"']
-    .map(f => document.fonts.load(f, f.includes('Tiro') ? 'कलाम आश्रम' : 'Aa₹')));
+  await Promise.all(fonts.map(f => document.fonts.load(f, f.includes(deva) ? 'कलाम आश्रम' : 'Aa₹')));
   RS.SCALE = 1; $('#stage').style.transform = 'none';
   // build every scene while visible so measurements are real
   for (const s of scenes) { s.el.style.visibility = 'visible'; s.build(); s.el.style.display = 'none'; s.on = false; }
@@ -171,15 +190,15 @@ async function start({ W, H }) {
   if (q.has('render')) { seek(+q.get('t') || 0); window.__ready = true; return; }
   fit(); addEventListener('resize', fit);
   // real-time preview (click to play with sound)
-  const audio = new Audio('../assets/showreel-audio.m4a'); let start = null, off = +q.get('t') || 0;
+  const snd = new Audio(audio); let start = null, off = +q.get('t') || 0;
   seek(off);
   const loop = now => { if (start !== null) { const t = off + (now - start) / 1000; if (t >= DUR) { start = null; off = 0; } else seek(t); } requestAnimationFrame(loop); };
   requestAnimationFrame(loop);
   const hint = document.createElement('div');
   hint.textContent = '▶  Play — with sound';
-  hint.style.cssText = 'position:fixed;left:50%;bottom:6vh;transform:translateX(-50%);padding:14px 26px;border-radius:30px;background:#ff4d1c;color:#0a0a0a;font:600 15px Inter,sans-serif;letter-spacing:.02em;cursor:pointer;z-index:9;box-shadow:0 10px 40px rgba(255,77,28,.4)';
+  hint.style.cssText = `position:fixed;left:50%;bottom:6vh;transform:translateX(-50%);padding:14px 26px;border-radius:30px;background:${accent};color:#0a0a0a;font:600 15px Inter,sans-serif;letter-spacing:.02em;cursor:pointer;z-index:9;box-shadow:0 10px 40px ${accent}66`;
   document.body.appendChild(hint);
-  addEventListener('click', () => { hint.remove(); if (start === null) { off = off >= DUR - .05 ? 0 : off; audio.currentTime = off; audio.play().catch(() => {}); start = performance.now(); } else { audio.pause(); off += (performance.now() - start) / 1000; start = null; } });
+  addEventListener('click', () => { hint.remove(); if (start === null) { off = off >= DUR - .05 ? 0 : off; snd.currentTime = off; snd.play().catch(() => {}); start = performance.now(); } else { snd.pause(); off += (performance.now() - start) / 1000; start = null; } });
 }
 
 window.__seek = seek;

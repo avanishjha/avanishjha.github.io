@@ -58,6 +58,11 @@ footer{margin-top:48px;font-family:var(--mono);font-size:12px;letter-spacing:.14
 .vert .player{max-width:340px;width:100%;justify-self:center}
 .vert video{aspect-ratio:9/16}
 @media (max-width:760px){.vert{grid-template-columns:1fr}}
+.v2{margin-top:clamp(48px,7vw,88px);padding-top:clamp(32px,5vw,56px);border-top:1px solid rgba(239,236,228,.1)}
+.v2 .k{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#8b6dff;margin-bottom:14px}
+.v2 h2{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(36px,5vw,64px);line-height:.95;letter-spacing:-.02em;margin-bottom:clamp(20px,3vw,28px)}
+.v2 h2 em{background:linear-gradient(100deg,#8b6dff,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+.v2 .player{box-shadow:0 40px 120px rgba(124,92,255,.18),0 0 0 1px rgba(239,236,228,.08)}
 @media (max-width:560px){.btn{width:100%;justify-content:center}}
 </style>
 </head>
@@ -75,6 +80,19 @@ footer{margin-top:48px;font-family:var(--mono);font-size:12px;letter-spacing:.14
     <a class="btn" href="avanish-jha-showreel-2026.mp4" download>Download <small>1080p · 60fps</small></a>
     <a class="btn" href="avanish-jha-showreel-2026-720p.mp4" download>For WhatsApp <small>720p · small</small></a>
   </div>
+  <section class="v2">
+    <div class="k">Vol. 02 · Aurora</div>
+    <h2>A pixel becomes a <em>product.</em></h2>
+    <div class="player">
+      <video controls playsinline preload="metadata" poster="assets/poster-vol2.jpg">
+        <source src="avanish-jha-showreel-2026-vol2.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="row">
+      <a class="btn" href="avanish-jha-showreel-2026-vol2.mp4" download>Download Vol. 02 <small>1080p · 60fps</small></a>
+      <a class="btn" href="avanish-jha-showreel-2026-vol2-720p.mp4" download>For WhatsApp <small>720p · small</small></a>
+    </div>
+  </section>
   <section class="vert">
     <div>
       <div class="k">Vertical cut · 9:16</div>

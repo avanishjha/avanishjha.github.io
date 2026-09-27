@@ -2,6 +2,7 @@
 # Blend motion-blur sub-frames, mux the soundtrack and export deliverables.
 #   ./encode.sh <framesDir> <soundtrack.wav> [sub=4]
 #   9:16 cut:  NAME=avanish-jha-showreel-2026-vertical SHARE=720:1280 POSTER=poster-vertical ./encode.sh …
+#   Vol. 02:   NAME=avanish-jha-showreel-2026-vol2 POSTER=poster-vol2 AUDIO=showreel-vol2-audio ./encode.sh …
 set -euo pipefail
 FRAMES=$1; WAV=$2; SUB=${3:-4}
 HERE=$(cd "$(dirname "$0")" && pwd); OUT=$(dirname "$HERE")
@@ -10,7 +11,7 @@ EXT=$(ls "$FRAMES" | sed -n '1s/.*\.//p')
 RATE=$((60 * SUB))
 BLEND="tmix=frames=$SUB,select='eq(mod(n\,$SUB)\,$((SUB - 1)))',setpts=N/60/TB"
 [ "$SUB" = 1 ] && BLEND="setpts=N/60/TB"
-NAME=${NAME:-avanish-jha-showreel-2026}; SHARE=${SHARE:-1280:720}; POSTER=${POSTER:-poster}
+NAME=${NAME:-avanish-jha-showreel-2026}; SHARE=${SHARE:-1280:720}; POSTER=${POSTER:-poster}; AUDIO=${AUDIO:-showreel-audio}
 mkdir -p "$OUT/assets"
 
 # 1 · master: 1080p60, H.264 High, AAC (soundtrack is mastered to ≈ -14 LUFS in audio.py)
@@ -31,5 +32,5 @@ M="$OUT/$NAME.mp4"
 
 # 3 · poster (final logo lockup) + audio for the live, in-browser version
 "$FF" -hide_banner -loglevel error -y -ss 29.9 -i "$M" -frames:v 1 -q:v 3 "$OUT/assets/$POSTER.jpg"
-"$FF" -hide_banner -loglevel error -y -i "$M" -vn -c:a copy "$OUT/assets/showreel-audio.m4a"
+"$FF" -hide_banner -loglevel error -y -i "$M" -vn -c:a copy "$OUT/assets/$AUDIO.m4a"
 ls -la "$OUT"/*.mp4 "$OUT"/assets/
